@@ -10,7 +10,8 @@ builder.Configuration.AddJsonFile("secrets.json", true);
 // Add services to the container.
 var serverVersion = new MariaDbServerVersion(new Version(10, 5));
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(connectionString, serverVersion)
 );
