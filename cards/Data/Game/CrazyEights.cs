@@ -209,6 +209,9 @@ public class CrazyEights : IGameService
 
         public bool Execute(int player)
         {
+            // Abort if not executable
+            if (!IsExecutable(player)) return false;
+            
             // The next player has not played the eight
             _game._hasPlayedEight = false;
             _game._wishedColor = _suit;
