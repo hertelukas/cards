@@ -4,13 +4,15 @@ namespace cards.Data;
 
 public class Lobby
 {
+    private readonly string _name;
     private readonly string _password;
     private IGameService _game;
     private List<Player> _players;
 
-    public Lobby(string username, string password)
+    public Lobby(string username, string name, string password)
     {
         _players = new List<Player> {new(username)};
+        _name = name;
         _password = password;
     }
 
