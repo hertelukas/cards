@@ -14,6 +14,12 @@ public class Lobby
         _password = password;
     }
 
+    /// <summary>
+    /// Let a user join a lobby. If the user is already in the lobby, SUCCESS gets returned and nothing happens.
+    /// </summary>
+    /// <param name="username">of the user that wants to join the lobby</param>
+    /// <param name="password">of this lobby</param>
+    /// <returns>If the action was successful</returns>
     public Response JoinLobby(string username, string password)
     {
         if (!_password.Equals(password)) return Response.InvalidPassword;
@@ -27,10 +33,16 @@ public class Lobby
         return Response.Success;
     }
 
+    /// <summary>
+    /// Check if a user is in this lobby 
+    /// </summary>
+    /// <param name="username">of the user that should get checked</param>
+    /// <returns>Whether the given user is in this lobby</returns>
     public bool HasAccess(string username)
     {
         return _players.Exists(p => p.Username.Equals(username));
     }
+
     public void SelectGame()
     {
         throw new NotImplementedException();

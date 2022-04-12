@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using cards.Data;
-using cards.Data.Game.Decks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
