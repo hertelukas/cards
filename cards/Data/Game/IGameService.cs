@@ -80,4 +80,10 @@ public interface IGameService
     /// <param name="card">The card played</param>
     public void Play(int id, ICard card);
 
+    /// <summary>
+    /// A list of extra play options
+    /// </summary>
+    /// <returns></returns>
+    public List<IGameFeature> GetExtraOptions();
+
 }

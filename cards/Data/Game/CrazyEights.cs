@@ -155,4 +155,9 @@ public class CrazyEights : IGameService
 
         _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
     }
+
+    public List<IGameFeature> GetExtraOptions()
+    {
+        throw new NotImplementedException();
+    }
 }
