@@ -8,6 +8,8 @@ public class CrazyEights : IGameService
     private Queue<ICard> _deck;
     private Stack<ICard> _playedCards;
     private int _currentPlayer = 0;
+    private Poker.Suit _wishedColor = Poker.Suit.Hearts;
+    private bool _hasPlayedEight = false;
 
     public string GetTitle()
     {
@@ -76,7 +78,7 @@ public class CrazyEights : IGameService
         if (_deck.Count == 0)
         {
             var topCard = _playedCards.Pop();
-            
+
             _deck = new Queue<ICard>();
 
             while (_playedCards.Count > 0)
@@ -110,7 +112,14 @@ public class CrazyEights : IGameService
         var topCard = (Poker.Card) GetLastPlayedCard();
         var playedCard = (Poker.Card) card;
 
-        return topCard.Value == playedCard.Value || topCard.Suit == playedCard.Suit || playedCard.Value == Poker.Value.Eight;
+        // If the last card is an 8, we have to look at the wish
+        if (topCard.Value == Poker.Value.Eight)
+        {
+            return playedCard.Value == Poker.Value.Eight || playedCard.Suit == _wishedColor;
+        }
+
+        return topCard.Value == playedCard.Value || topCard.Suit == playedCard.Suit ||
+               playedCard.Value == Poker.Value.Eight;
     }
 
     public ICollection<ICard> Shuffle()
@@ -137,7 +146,6 @@ public class CrazyEights : IGameService
 
     public void Play(int id, ICard card)
     {
-        // TODO let players wish a suit after playing 8
         // Check whether the player owns this card
         if (!_playerCards[id].Contains(card))
         {
@@ -153,11 +161,59 @@ public class CrazyEights : IGameService
         _playerCards[id].Remove(card);
         _playedCards.Push(card);
 
-        _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
+        // If no eight played, the game goes on
+        if (((Poker.Card) card).Value != Poker.Value.Eight)
+        {
+            _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
+        }
+        else
+        {
+            _hasPlayedEight = true;
+        }
     }
 
     public List<IGameFeature> GetExtraOptions()
     {
-        throw new NotImplementedException();
+        var result = new List<IGameFeature>
+        {
+            new ChooseSuit(this, Poker.Suit.Clovers),
+            new ChooseSuit(this, Poker.Suit.Hearts),
+            new ChooseSuit(this, Poker.Suit.Tiles),
+            new ChooseSuit(this, Poker.Suit.Pikes)
+        };
+
+        return result;
+    }
+
+    private class ChooseSuit : IGameFeature
+    {
+        private readonly CrazyEights _game;
+        private readonly Poker.Suit _suit;
+
+        public ChooseSuit(CrazyEights game, Poker.Suit t)
+        {
+            _game = game;
+            _suit = t;
+        }
+
+        public string GetName()
+        {
+            return "Choose " + _suit;
+        }
+
+        public bool IsExecutable(int player)
+        {
+            // If the player isn't playing or did not play an eight, he can't choose a suit
+            return _game._currentPlayer == player && _game._hasPlayedEight;
+        }
+
+        public bool Execute(int player)
+        {
+            // The next player has not played the eight
+            _game._hasPlayedEight = false;
+            _game._wishedColor = _suit;
+            _game._currentPlayer = (_game._currentPlayer + 1) % _game._playerCards.Length;
+            return true;
+        }
     }
 }
