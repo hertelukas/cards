@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using cards.Data;
+using cards.Hubs;
 using cards.Services;
 using Microsoft.AspNetCore.Identity.UI.Services;
 
@@ -24,7 +25,9 @@ builder.Services.AddDefaultIdentity<CardsUser>(options =>
         options.Password.RequireUppercase = false;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
 
 // Load lobby service
 builder.Services.AddSingleton<ILobbyService, EasyLobbyService>();
@@ -70,5 +73,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHub<GameHub>("/gameHub");
 
 app.Run();
