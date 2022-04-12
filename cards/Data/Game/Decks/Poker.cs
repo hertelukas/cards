@@ -1,6 +1,6 @@
 namespace cards.Data.Game.Decks;
 
-public class Poker
+public class Poker : ICard
 {
     public record Card(Suit Suit, Value Value);
     public enum Suit
