@@ -32,4 +32,16 @@ public class EasyLobbyService : ILobbyService
             return Response.NotFound;
         }
     }
+
+    public bool HasAccess(int id, string username)
+    {
+        try
+        {
+            return _lobbies[id].HasAccess(username);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return false;
+        }
+    }
 }

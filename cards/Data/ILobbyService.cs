@@ -13,4 +13,6 @@ public interface ILobbyService
     
     public Lobby GetLobby(int id);
     public Response JoinLobby(int id, string password, string username);
+
+    public bool HasAccess(int id, string username);
 }

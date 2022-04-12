@@ -34,7 +34,7 @@ public class JoinModel : PageModel
             return _lobbyService.JoinLobby(Input.Id, Input.Password, username ?? throw new NullReferenceException())
                 switch
                 {
-                    Data.Response.Success => RedirectToPage("Index", Input.Id),
+                    Data.Response.Success => RedirectToPage("Index", new {Input.Id}),
                     _ => Page()
                 };
         }

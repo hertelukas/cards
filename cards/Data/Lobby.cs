@@ -27,6 +27,10 @@ public class Lobby
         return Response.Success;
     }
 
+    public bool HasAccess(string username)
+    {
+        return _players.Exists(p => p.Username.Equals(username));
+    }
     public void SelectGame()
     {
         throw new NotImplementedException();
