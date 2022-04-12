@@ -5,7 +5,7 @@ namespace cards.Data;
 /// </summary>
 public class Player
 {
-    private string Username { get; }
+    public string Username { get; }
     
     public Player(string username)
     {

@@ -18,7 +18,12 @@ public class Lobby
     {
         if (!_password.Equals(password)) return Response.InvalidPassword;
 
-        _players.Add(new Player(username));
+        // Check if player is already in the list
+        if (!_players.Exists(p => p.Username.Equals(username)))
+        {
+            _players.Add(new Player(username));
+        }
+
         return Response.Success;
     }
 
