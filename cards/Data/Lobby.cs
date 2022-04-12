@@ -1,4 +1,4 @@
-using cards.Services;
+using cards.Data.Game;
 
 namespace cards.Data;
 
