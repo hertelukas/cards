@@ -5,3 +5,13 @@
     ViewData["Title"] = "Create";
 }
 
+<form asp-page="Lobby/Create">
+    <div class="form-floating">
+        <input asp-for="Input.Name" class="form-control" aria-required="true">
+        <label asp-for="Input.Name" class="form-label"></label>
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+    <div>
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</form>
