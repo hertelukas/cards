@@ -16,12 +16,14 @@ public class Lobby
 
     public Response JoinLobby(string username, string password)
     {
-        throw new NotImplementedException();
+        if (!_password.Equals(password)) return Response.InvalidPassword;
+
+        _players.Add(new Player(username));
+        return Response.Success;
     }
 
     public void SelectGame()
     {
         throw new NotImplementedException();
     }
-
 }

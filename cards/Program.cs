@@ -1,5 +1,3 @@
-using System.Configuration;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using cards.Data;
 using cards.Services;
@@ -27,6 +25,9 @@ builder.Services.AddDefaultIdentity<CardsUser>(options =>
     })
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddRazorPages();
+
+// Load lobby service
+builder.Services.AddSingleton<ILobbyService, EasyLobbyService>();
 
 // Configure URLs
 builder.Services.Configure<RouteOptions>(options =>
