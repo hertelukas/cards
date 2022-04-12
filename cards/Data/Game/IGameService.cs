@@ -15,6 +15,12 @@ public interface IGameService
     /// </summary>
     /// <returns>A detailed description about the rules of the game</returns>
     public string GetDescription();
+
+    /// <summary>
+    /// Setup a new game
+    /// </summary>
+    /// <param name="players">The amount of players in that game</param>
+    public void Initialize(int players);
     
     /// <summary>
     /// Get the winner of the current game
@@ -39,7 +45,7 @@ public interface IGameService
     /// </summary>
     /// <param name="id">The id of the player</param>
     /// <returns>A collection of all the cards</returns>
-    public ICollection<ICard> GetCards(int id);
+    public ICollection<ICard> GetHand(int id);
 
     /// <summary>
     /// Get all playable cards of a player
@@ -47,6 +53,13 @@ public interface IGameService
     /// <param name="id">The id of the player</param>
     /// <returns>A collection of all the cards that are playable</returns>
     public ICollection<ICard> GetPlayableCards(int id);
+
+    /// <summary>
+    /// Checks whether a card can be played
+    /// </summary>
+    /// <param name="card">The card that should be played</param>
+    /// <returns>True, if it can be played</returns>
+    public bool IsPlayable(ICard card);
 
     /// <summary>
     /// Shuffles all remaining cards in the deck

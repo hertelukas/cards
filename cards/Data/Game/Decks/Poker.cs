@@ -1,8 +1,19 @@
 namespace cards.Data.Game.Decks;
 
-public class Poker : ICard
+public class Poker
 {
-    public record Card(Suit Suit, Value Value);
+    public class Card : ICard
+    {
+        public Card(Value value, Suit suit)
+        {
+            Value = value;
+            Suit = suit;
+        }
+
+        public Suit Suit { get; }
+        public Value Value { get; }
+    }
+
     public enum Suit
     {
         Hearts,
