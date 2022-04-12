@@ -31,8 +31,7 @@ public class CreateModel : PageModel
             return RedirectToPage("Index",
                 new
                 {
-                    id = _lobbyService.CreateLobby(username ?? throw new NullReferenceException(), Input.Name,
-                        Input.Password)
+                    id = _lobbyService.CreateLobby(username ?? throw new NullReferenceException(), Input.Password)
                 });
         }
         catch (NullReferenceException)
@@ -43,11 +42,6 @@ public class CreateModel : PageModel
 
     public class InputModel
     {
-        [Required]
-        [DataType(DataType.Text)]
-        [Display(Name = "Lobby Name")]
-        public string Name { get; set; }
-
         [Required]
         [DataType(DataType.Password)]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",

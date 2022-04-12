@@ -9,9 +9,9 @@ public class EasyLobbyService : ILobbyService
         _lobbies = new List<Lobby>();
     }
 
-    public int CreateLobby(string username, string name, string password)
+    public int CreateLobby(string username, string password)
     {
-        _lobbies.Add(new Lobby(username, name, password));
+        _lobbies.Add(new Lobby(username, password));
 
         return _lobbies.Count - 1;
     }
