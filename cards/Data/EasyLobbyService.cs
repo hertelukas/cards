@@ -44,4 +44,29 @@ public class EasyLobbyService : ILobbyService
             return false;
         }
     }
+
+    public void SetConnectionId(int id, string username, string? connectionId)
+    {
+        try
+        {
+            _lobbies[id].SetConnectionId(username, connectionId);
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            
+        }
+    }
+
+    public int DisconnectConnection(string connectionId)
+    {
+        for (var i = 0; i < _lobbies.Count; i++)
+        {
+            if (_lobbies[i].DisconnectConnection(connectionId))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 }

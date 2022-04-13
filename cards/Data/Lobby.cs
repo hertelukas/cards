@@ -43,6 +43,26 @@ public class Lobby
         return _players.Exists(p => p.Username.Equals(username));
     }
 
+    /// <summary>
+    /// Set the connection id of a user
+    /// </summary>
+    /// <param name="username">of the user</param>
+    /// <param name="connectionId">of the user, -1 if disconnected</param>
+    public void SetConnectionId(string username, string? connectionId)
+    {
+        _players.First(p => p.Username.Equals(username)).ConnectionId = connectionId;
+    }
+
+    public bool DisconnectConnection(string connectionId)
+    {
+        foreach (var player in _players.Where(player => player.ConnectionId != null && player.ConnectionId.Equals(connectionId)))
+        {
+            player.ConnectionId = null;
+            return true;
+        }
+
+        return false;
+    }
     public void SelectGame()
     {
         throw new NotImplementedException();

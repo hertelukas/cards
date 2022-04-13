@@ -6,6 +6,7 @@ namespace cards.Data;
 public class Player
 {
     public string Username { get; }
+    public string? ConnectionId { get; set; }
     
     public Player(string username)
     {
