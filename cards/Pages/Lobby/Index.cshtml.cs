@@ -16,6 +16,8 @@ public class IndexModel : PageModel
     }
 
     public int Id { get; set; }
+    public Data.Lobby Lobby { get; private set; }
+    public string Username { get; private set; }
     public IActionResult OnGet(int id)
     {
         Id = id;
@@ -29,6 +31,9 @@ public class IndexModel : PageModel
             {
                 return RedirectToPage("Join", new {Id});
             }
+
+            Lobby = _lobbyService.GetLobby(Id);
+            Username = username;
 
             return Page();
         }

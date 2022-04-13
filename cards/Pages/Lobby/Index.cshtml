@@ -4,3 +4,23 @@
 @{
     ViewData["Title"] = "Lobby " + Model.Id;
 }
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+
+<script >
+"use strict"
+const connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+
+
+// Connect to the hub
+connection.start().then(function () {
+    connection.invoke("Connect", "@Model.Username", @Model.Id).catch(function(err) {
+        // TODO handle error
+        return console.error(err.toString());
+    });
+}).catch(function (err) {
+    // TODO handle error
+    return console.error(err.toString());
+});
+
+</script>
