@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using cards.Data.Game;
 
 namespace cards.Data;
@@ -62,6 +63,13 @@ public class Lobby
         }
 
         return false;
+    }
+
+    public ReadOnlyCollection<string> GetConnectedUsernames()
+    {
+        var result = _players.Where(player => player.ConnectionId != null).Select(player => player.Username).ToList();
+
+        return new ReadOnlyCollection<string>(result);
     }
     public void SelectGame()
     {

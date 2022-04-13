@@ -12,17 +12,28 @@ public class GameHub : Hub
         _lobbyService = lobbyService;
     }
 
-    public async Task Connect(string username, int lobbyId)
+    public async Task ConnectAsync(string username, int lobbyId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
 
         _lobbyService.SetConnectionId(lobbyId, username, Context.ConnectionId);
+
+        await SendConnectedUsersUpdateAsync(lobbyId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId,
-            _lobbyService.DisconnectConnection(Context.ConnectionId).ToString());
+        var lobbyId = _lobbyService.DisconnectConnection(Context.ConnectionId);
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
+        await SendConnectedUsersUpdateAsync(lobbyId);
         await base.OnDisconnectedAsync(exception);
+    }
+
+
+    // Send updates
+    private async Task SendConnectedUsersUpdateAsync(int lobbyId)
+    {
+        await Clients.Group(lobbyId.ToString()).SendAsync("ConnectedUsersUpdate",
+            _lobbyService.GetLobby(lobbyId).GetConnectedUsernames());
     }
 }

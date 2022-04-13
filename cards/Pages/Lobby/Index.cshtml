@@ -5,22 +5,54 @@
     ViewData["Title"] = "Lobby " + Model.Id;
 }
 
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
+@* Connected users offset canvas *@
+<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#connectedUsersCanvas" role="button" aria-controls="connectedUsersCanvas">
+    Connected Users
+</a>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="connectedUsersCanvas" aria-labelledby="connectedUsersCanvasLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="connectedUsersCanvasLabel">Connected</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div>
+            <ul id="userList"></ul>
+        </div>
+    </div>
+</div>
+<script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 
 <script >
 "use strict"
 const connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 
+const userList = document.getElementById("userList");
 
 // Connect to the hub
 connection.start().then(function () {
-    connection.invoke("Connect", "@Model.Username", @Model.Id).catch(function(err) {
+    connection.invoke("ConnectAsync", "@Model.Username", @Model.Id).catch(function(err) {
         // TODO handle error
         return console.error(err.toString());
     });
 }).catch(function (err) {
     // TODO handle error
     return console.error(err.toString());
+});
+
+// Listen to updates
+connection.on("ConnectedUsersUpdate", function (users) {
+    // Clear all children
+    while (userList.firstChild){
+        userList.removeChild(userList.firstChild);
+    }
+    
+    for (const user of users) {
+        const li = document.createElement("li");
+        li.textContent = user;
+        
+        userList.appendChild(li);
+    }
 });
 
 </script>
