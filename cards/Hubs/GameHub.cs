@@ -1,4 +1,5 @@
 using cards.Data;
+using cards.Data.Game;
 using Microsoft.AspNetCore.SignalR;
 
 namespace cards.Hubs;
@@ -12,7 +13,9 @@ public class GameHub : Hub
         _lobbyService = lobbyService;
     }
 
-    public async Task ConnectAsync(string username, int lobbyId)
+    #region Connections
+
+    public async Task Connect(string username, int lobbyId)
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
 
@@ -29,11 +32,30 @@ public class GameHub : Hub
         await base.OnDisconnectedAsync(exception);
     }
 
+    #endregion
 
-    // Send updates
+    #region Receive
+
+    public async Task ReceiveSelectGame(int lobbyId, GameEnum game)
+    {
+        _lobbyService.GetLobby(lobbyId).SelectGame(game);
+        await SendSelectedGameAsync(lobbyId, game);
+    }
+
+    #endregion
+
+    #region Send
+
     private async Task SendConnectedUsersUpdateAsync(int lobbyId)
     {
         await Clients.Group(lobbyId.ToString()).SendAsync("ConnectedUsersUpdate",
             _lobbyService.GetLobby(lobbyId).GetConnectedUsernames());
     }
+
+    private async Task SendSelectedGameAsync(int lobbyId, GameEnum game)
+    {
+        await Clients.Group(lobbyId.ToString()).SendAsync("SelectedGameUpdate", game);
+    }
+
+    #endregion
 }

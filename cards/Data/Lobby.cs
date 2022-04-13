@@ -7,7 +7,10 @@ public class Lobby
 {
     private readonly string _password;
     private IGameService _game;
-    private List<Player> _players;
+    private readonly List<Player> _players;
+    public bool HasStarted { get; private set; }
+    public GameEnum SelectedGame { get; private set; }
+    public bool HasSelected { get; private set; }
 
     public Lobby(string username, string password)
     {
@@ -56,7 +59,8 @@ public class Lobby
 
     public bool DisconnectConnection(string connectionId)
     {
-        foreach (var player in _players.Where(player => player.ConnectionId != null && player.ConnectionId.Equals(connectionId)))
+        foreach (var player in _players.Where(player =>
+                     player.ConnectionId != null && player.ConnectionId.Equals(connectionId)))
         {
             player.ConnectionId = null;
             return true;
@@ -71,8 +75,35 @@ public class Lobby
 
         return new ReadOnlyCollection<string>(result);
     }
-    public void SelectGame()
+
+    public void SelectGame(GameEnum game)
     {
-        throw new NotImplementedException();
+        // If game started, nothing will happen
+        if (HasStarted) return;
+
+        HasSelected = true;
+        SelectedGame = game;
+    }
+
+    public void StartGame()
+    {
+        HasStarted = true;
+
+        switch (SelectedGame)
+        {
+            case GameEnum.CrazyEights:
+                _game = new CrazyEights();
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null);
+        }
+
+        // Remove all unconnected players
+        foreach (var player in _players.Where(player => player.ConnectionId == null))
+        {
+            _players.Remove(player);
+        }
+
+        _game.Initialize(_players.Count);
     }
 }

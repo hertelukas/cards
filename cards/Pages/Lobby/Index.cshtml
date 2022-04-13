@@ -1,4 +1,6 @@
 @page "{id:int}"
+@using cards.Data.Game
+@using Humanizer
 @model IndexModel
 
 @{
@@ -21,17 +23,41 @@
         </div>
     </div>
 </div>
+
+<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button"
+            id="selectGameDropdownButton" data-bs-toggle="dropdown"
+            aria-expanded="false">
+        @if (Model.Lobby.HasSelected)
+        {
+            <span>@Model.Lobby.SelectedGame</span>
+        }
+        else
+        {
+            <span>Select Game</span>
+        }
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="selectGameDropdownButton" id="selectableGamesList">
+        @foreach (var game in Enum.GetValues<GameEnum>())
+        {
+            <li>
+                <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@game.Humanize()</button>
+            </li>
+        }
+    </ul>
+</div>
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 
 <script >
 "use strict"
 const connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+const games = ["@Html.Raw(string.Join("\", \"", Enum.GetNames<GameEnum>()))"];
 
 const userList = document.getElementById("userList");
 
 // Connect to the hub
 connection.start().then(function () {
-    connection.invoke("ConnectAsync", "@Model.Username", @Model.Id).catch(function(err) {
+    connection.invoke("Connect", "@Model.Username", @Model.Id).catch(function(err) {
         // TODO handle error
         return console.error(err.toString());
     });
@@ -54,5 +80,19 @@ connection.on("ConnectedUsersUpdate", function (users) {
         userList.appendChild(li);
     }
 });
+
+const selectDropdownButton = document.getElementById("selectGameDropdownButton");
+connection.on("SelectedGameUpdate", function(game) {
+    selectDropdownButton.innerText = games[game];
+});
+
+// Send updates
+// React to game selection
+function setGame(game){
+    connection.invoke("ReceiveSelectGame", @Model.Id, game).catch(function(err) {
+      return console.log(err.toString());
+    })
+}
+
 
 </script>
