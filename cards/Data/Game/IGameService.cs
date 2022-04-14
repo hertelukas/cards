@@ -84,7 +84,14 @@ public interface IGameService
     /// A list of extra play options
     /// </summary>
     /// <returns></returns>
-    public List<IGameFeature> GetExtraOptions();
+    public IEnumerable<IGameFeature> GetExtraOptions();
+
+    /// <summary>
+    /// Executes a feature, does nothing if fails
+    /// </summary>
+    /// <param name="id">The id of the player who tries to execute the feature</param>
+    /// <param name="featureId">The id of the feature</param>
+    public void ExecuteFeature(int id, int featureId);
 
     /// <summary>
     /// Representation of the current game, for every user

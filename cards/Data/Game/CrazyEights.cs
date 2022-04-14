@@ -157,7 +157,7 @@ public class CrazyEights : IGameService
         {
             return;
         }
-        
+
         // Check whether the player owns this card
         if (_playerCards[id].Count < cardIndex)
         {
@@ -186,7 +186,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    public List<IGameFeature> GetExtraOptions()
+    public IEnumerable<IGameFeature> GetExtraOptions()
     {
         var result = new List<IGameFeature>
         {
@@ -200,6 +200,11 @@ public class CrazyEights : IGameService
         return result;
     }
 
+    public void ExecuteFeature(int id, int featureId)
+    {
+        GetExtraOptions().ToList()[featureId].Execute(id);
+    }
+
     public List<GameData> GetGameData()
     {
         var result = new List<GameData>();
@@ -208,18 +213,25 @@ public class CrazyEights : IGameService
         {
             var cards = _playerCards[i].Select(card => card.ToString());
             var otherPlayersAmountOfCards = new List<int>();
-            
+
             for (var j = 1; j < _playerCards.Length; j++)
             {
                 otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
             }
 
-            result.Add(new GameData(cards, otherPlayersAmountOfCards, GetLastPlayedCard().ToString()));
+            var features = GetExtraOptions().Select(feature => feature.GetName()).ToList();
+
+            result.Add(new GameData(
+                cards,
+                otherPlayersAmountOfCards,
+                GetLastPlayedCard().ToString(),
+                features
+            ));
         }
 
         return result;
     }
-    
+
     private class TakeCardFeature : IGameFeature
     {
         private readonly CrazyEights _game;
@@ -243,7 +255,7 @@ public class CrazyEights : IGameService
         {
             // Abort if not executable
             if (!IsExecutable(player)) return false;
-            
+
             _game._playerCards[player].Add(_game._deck.Dequeue());
             return true;
         }
@@ -275,7 +287,7 @@ public class CrazyEights : IGameService
         {
             // Abort if not executable
             if (!IsExecutable(player)) return false;
-            
+
             // The next player has not played the eight
             _game._hasPlayedEight = false;
             _game._wishedColor = _suit;

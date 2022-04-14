@@ -54,6 +54,12 @@ public class GameHub : Hub
         await SendGameUpdateAsync(lobbyId);
     }
 
+    public async Task ReceiveFeature(int lobbyId, int playerId, int featureId)
+    {
+        _lobbyService.GetLobby(lobbyId).ExecuteFeature(playerId, featureId);
+        await SendGameUpdateAsync(lobbyId);
+    }
+
     #endregion
 
     #region Send

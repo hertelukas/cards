@@ -121,4 +121,9 @@ public class Lobby
     {
         _game.Play(playerId, cardIndex);
     }
+
+    public void ExecuteFeature(int playerId, int featureId)
+    {
+        _game.ExecuteFeature(playerId, featureId);
+    }
 }
