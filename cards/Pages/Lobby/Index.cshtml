@@ -96,21 +96,37 @@ connection.on("SelectedGameUpdate", function(game) {
 
 const dropdown = document.getElementById("gameDropdown");
 const startButton = document.getElementById("startGameButton");
+let selectedCard = -1;
+let cardButtons = [];
 connection.on("GameUpdate", function (gameData) {
     // Delete all children
     while (game.firstChild){
         game.removeChild(game.firstChild);
     }
     
+    cardButtons = [];
+    selectedCard = -1;
+    
     dropdown.hidden = true;
     startButton.hidden = true;
     
     // My cards
-    for (const card of gameData["cards"]) {
+    for(let i = 0; i < gameData["cards"].length; i++) {
         let tmp = document.createElement("button");
-        tmp.classList.add("btn");
-        tmp.classList.add("btn-light");
-        tmp.innerHTML = card;
+        tmp.className = "btn btn-light";
+        tmp.innerHTML = gameData["cards"][i];
+        cardButtons.push(tmp);
+        tmp.onclick = function (){
+            selectedCard = i;
+            
+            for (let j = 0; j < cardButtons.length; j++) {
+                cardButtons[j].className = "btn btn-light";
+                
+                if (i === j) {
+                    cardButtons[j].className = "btn btn-dark";
+                }
+            }
+        };
         
         game.appendChild(tmp);
     }
