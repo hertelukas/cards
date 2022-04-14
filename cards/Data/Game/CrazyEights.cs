@@ -172,6 +172,7 @@ public class CrazyEights : IGameService
         if (((Poker.Card) card).Value != Poker.Value.Eight)
         {
             _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
+            _hasPlayedEight = false;
         }
         else
         {
@@ -206,7 +207,7 @@ public class CrazyEights : IGameService
                 otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
             }
 
-            result.Add(new GameData(cards, otherPlayersAmountOfCards, _deck.Peek().ToString()));
+            result.Add(new GameData(cards, otherPlayersAmountOfCards, GetLastPlayedCard().ToString()));
         }
 
         return result;
