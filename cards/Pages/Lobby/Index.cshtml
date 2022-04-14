@@ -148,6 +148,7 @@ connection.on("GameUpdate", function (gameData) {
     
     let playButton = document.createElement("button");
     playButton.innerText = "Play";
+    playButton.className = "btn btn-primary";
     playButton.onclick = function (){
         play(gameData["id"]);
     }
