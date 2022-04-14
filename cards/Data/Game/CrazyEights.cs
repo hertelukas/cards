@@ -220,12 +220,14 @@ public class CrazyEights : IGameService
             }
 
             var features = GetExtraOptions().Select(feature => feature.GetName()).ToList();
+            var featuresEnabled = GetExtraOptions().Select(feature => feature.IsExecutable(i)).ToList();
 
             result.Add(new GameData(
                 cards,
                 otherPlayersAmountOfCards,
                 GetLastPlayedCard().ToString(),
                 features,
+                featuresEnabled,
                 _currentPlayer == i
             ));
         }
