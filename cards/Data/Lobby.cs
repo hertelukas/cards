@@ -92,6 +92,8 @@ public class Lobby
 
     public void StartGame()
     {
+        // If game started, nothing will happen
+        if (HasStarted) return;
         HasStarted = true;
 
         switch (SelectedGame)
