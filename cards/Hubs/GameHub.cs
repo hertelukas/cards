@@ -42,6 +42,12 @@ public class GameHub : Hub
         await SendSelectedGameAsync(lobbyId, game);
     }
 
+    public async Task ReceiveStartGame(int lobbyId)
+    {
+        _lobbyService.GetLobby(lobbyId).StartGame();
+        await SendGameUpdateAsync(lobbyId);
+    }
+
     #endregion
 
     #region Send
@@ -55,6 +61,11 @@ public class GameHub : Hub
     private async Task SendSelectedGameAsync(int lobbyId, GameEnum game)
     {
         await Clients.Group(lobbyId.ToString()).SendAsync("SelectedGameUpdate", game);
+    }
+
+    private async Task SendGameUpdateAsync(int lobbyId)
+    {
+        await Clients.Group(lobbyId.ToString()).SendAsync("GameUpdate");
     }
 
     #endregion

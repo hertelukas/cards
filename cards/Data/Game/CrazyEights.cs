@@ -28,6 +28,12 @@ public class CrazyEights : IGameService
         InitializeDeck();
         Shuffle();
 
+        // Initialize player cards
+        for (var i = 0; i < _playerCards.Length; i++)
+        {
+            _playerCards[i] = new List<ICard>();
+        }
+
         // Give every player 5 cards
         foreach (var hand in _playerCards)
         {

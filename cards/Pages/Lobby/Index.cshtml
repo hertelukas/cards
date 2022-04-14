@@ -24,7 +24,7 @@
     </div>
 </div>
 
-<div class="dropdown">
+<div id="gameDropdown" class="dropdown">
     <button class="btn btn-secondary dropdown-toggle" type="button"
             id="selectGameDropdownButton" data-bs-toggle="dropdown"
             aria-expanded="false">
@@ -46,6 +46,8 @@
         }
     </ul>
 </div>
+
+<button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 
 <script >
@@ -86,13 +88,25 @@ connection.on("SelectedGameUpdate", function(game) {
     selectDropdownButton.innerText = games[game];
 });
 
+const dropdown = document.getElementById("gameDropdown");
+const startButton = document.getElementById("startGameButton");
+connection.on("GameUpdate", function () {
+    console.log("Game started");
+    dropdown.hidden = true;
+    startButton.hidden = true;
+});
+
 // Send updates
 // React to game selection
 function setGame(game){
     connection.invoke("ReceiveSelectGame", @Model.Id, game).catch(function(err) {
       return console.log(err.toString());
-    })
+    });
 }
 
-
+function startGame(){
+    connection.invoke("ReceiveStartGame", @Model.Id).catch(function(err) {
+      return console.log(err.toString());
+    });
+}
 </script>
