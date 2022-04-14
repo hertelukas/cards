@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="240"
+   height="260"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.46"
+   version="1.0"
+   sodipodi:docbase="C:\Documents and Settings\Flanker\Desktop\Temporanei\SVG\Piacentine SVG"
+   sodipodi:docname="Suit_Hearts.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.5961538"
+     inkscape:cx="120"
+     inkscape:cy="130"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     inkscape:showpageshadow="false"
+     width="240px"
+     height="260px"
+     inkscape:window-width="1440"
+     inkscape:window-height="881"
+     inkscape:window-x="-4"
+     inkscape:window-y="-4"
+     showgrid="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Livello 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-288.15635,-348.0625)">
+    <path
+       style="opacity:1;fill:#dd1a1e;fill-opacity:1;stroke:none;stroke-width:0.2;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:3.9994173;stroke-dasharray:none;stroke-opacity:1"
+       d="M 352.8827,357.0625 C 314.8623,357.0625 300.05446,382.83029 300.05446,404.94657 C 300.05446,473.68557 361.30309,555.43738 408.18327,599.0625 C 455.0631,555.43738 516.25824,473.68557 516.25824,404.94657 C 516.25824,382.83029 501.45023,357.0625 463.42998,357.0625 C 432.79932,357.0625 413.07369,377.65274 413.07369,398.82 C 413.07369,405.21367 415.04039,412.95412 408.18327,412.95412 C 401.32596,412.95412 403.23901,405.21367 403.23901,398.82 C 403.23901,377.65274 383.51321,357.0625 352.8827,357.0625 z"
+       id="path2396" />
+  </g>
+</svg>
