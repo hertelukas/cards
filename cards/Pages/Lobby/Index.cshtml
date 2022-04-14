@@ -160,7 +160,7 @@ connection.on("GameUpdate", function (gameData) {
     // Add features
     for (let i = 0; i < gameData["features"].length; i++) {
         let button = document.createElement("button");
-        button.innerText = gameData["features"][i];
+        button.innerHTML = gameData["features"][i];
         button.className = "btn btn-primary";
         
         button.onclick = function () {

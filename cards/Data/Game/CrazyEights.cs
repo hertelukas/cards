@@ -275,7 +275,7 @@ public class CrazyEights : IGameService
 
         public string GetName()
         {
-            return "Choose " + _suit;
+            return "Choose <img src=/icons/suits/" + _suit + ".svg width =\"20\"</img>";
         }
 
         public bool IsExecutable(int player)
