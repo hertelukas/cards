@@ -152,6 +152,12 @@ public class CrazyEights : IGameService
 
     public void Play(int id, int cardIndex)
     {
+        // Check whether the player is playing
+        if (_currentPlayer != id)
+        {
+            return;
+        }
+        
         // Check whether the player owns this card
         if (_playerCards[id].Count < cardIndex)
         {
