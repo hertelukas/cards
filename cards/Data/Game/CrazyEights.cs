@@ -190,10 +190,11 @@ public class CrazyEights : IGameService
     {
         var result = new List<IGameFeature>
         {
-            new ChooseSuit(this, Poker.Suit.Clovers),
-            new ChooseSuit(this, Poker.Suit.Hearts),
-            new ChooseSuit(this, Poker.Suit.Tiles),
-            new ChooseSuit(this, Poker.Suit.Pikes)
+            new ChooseSuitFeature(this, Poker.Suit.Clovers),
+            new ChooseSuitFeature(this, Poker.Suit.Hearts),
+            new ChooseSuitFeature(this, Poker.Suit.Tiles),
+            new ChooseSuitFeature(this, Poker.Suit.Pikes),
+            new TakeCardFeature(this)
         };
 
         return result;
@@ -218,13 +219,42 @@ public class CrazyEights : IGameService
 
         return result;
     }
+    
+    private class TakeCardFeature : IGameFeature
+    {
+        private readonly CrazyEights _game;
 
-    private class ChooseSuit : IGameFeature
+        public TakeCardFeature(CrazyEights game)
+        {
+            _game = game;
+        }
+
+        public string GetName()
+        {
+            return "Take";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return _game._currentPlayer == player;
+        }
+
+        public bool Execute(int player)
+        {
+            // Abort if not executable
+            if (!IsExecutable(player)) return false;
+            
+            _game._playerCards[player].Add(_game._deck.Dequeue());
+            return true;
+        }
+    }
+
+    private class ChooseSuitFeature : IGameFeature
     {
         private readonly CrazyEights _game;
         private readonly Poker.Suit _suit;
 
-        public ChooseSuit(CrazyEights game, Poker.Suit t)
+        public ChooseSuitFeature(CrazyEights game, Poker.Suit t)
         {
             _game = game;
             _suit = t;
