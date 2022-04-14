@@ -116,4 +116,9 @@ public class Lobby
     {
         return _game.GetGameData();
     }
+
+    public void Play(int playerId, int cardIndex)
+    {
+        _game.Play(playerId, cardIndex);
+    }
 }

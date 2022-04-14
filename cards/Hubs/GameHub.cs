@@ -48,6 +48,12 @@ public class GameHub : Hub
         await SendGameUpdateAsync(lobbyId);
     }
 
+    public async Task ReceivePlay(int lobbyId, int playerId, int cardIndex)
+    {
+        _lobbyService.GetLobby(lobbyId).Play(playerId, cardIndex);
+        await SendGameUpdateAsync(lobbyId);
+    }
+
     #endregion
 
     #region Send
@@ -74,6 +80,7 @@ public class GameHub : Hub
             var connectionId = lobby.GetConnectionId(i);
             if (connectionId != null)
             {
+                gameData[i].Id = i;
                 await Clients.Client(connectionId).SendAsync("GameUpdate", gameData[i]);
             }
         }

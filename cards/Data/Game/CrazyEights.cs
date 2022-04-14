@@ -150,14 +150,15 @@ public class CrazyEights : IGameService
         return _playedCards.Peek();
     }
 
-    public void Play(int id, ICard card)
+    public void Play(int id, int cardIndex)
     {
         // Check whether the player owns this card
-        if (!_playerCards[id].Contains(card))
+        if (_playerCards[id].Count < cardIndex)
         {
             return;
         }
 
+        var card = _playerCards[id][cardIndex];
         // Check whether the card is playable
         if (!IsPlayable(card))
         {

@@ -110,6 +110,10 @@ connection.on("GameUpdate", function (gameData) {
     dropdown.hidden = true;
     startButton.hidden = true;
     
+    let currentCard = document.createElement("h1");
+    currentCard.innerHTML = gameData["topCard"];
+    game.appendChild(currentCard);
+    
     // My cards
     for(let i = 0; i < gameData["cards"].length; i++) {
         let tmp = document.createElement("button");
@@ -141,6 +145,13 @@ connection.on("GameUpdate", function (gameData) {
       game.appendChild(span);
       game.appendChild(document.createElement("br"));
     }
+    
+    let playButton = document.createElement("button");
+    playButton.innerText = "Play";
+    playButton.onclick = function (){
+        play(gameData["id"]);
+    }
+    game.appendChild(playButton);
 });
 
 // Send updates
@@ -154,6 +165,12 @@ function setGame(game){
 function startGame(){
     connection.invoke("ReceiveStartGame", @Model.Id).catch(function(err) {
       return console.log(err.toString());
+    });
+}
+
+function play(playerId){
+    connection.invoke("ReceivePlay", @Model.Id, playerId, selectedCard).catch(function (err) {
+        return console.log(err.toString());
     });
 }
 </script>

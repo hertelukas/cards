@@ -77,8 +77,8 @@ public interface IGameService
     /// Play a card
     /// </summary>
     /// <param name="id">The id of the player who tries to play</param>
-    /// <param name="card">The card played</param>
-    public void Play(int id, ICard card);
+    /// <param name="cardIndex">The index of the card that will be played</param>
+    public void Play(int id, int cardIndex);
 
     /// <summary>
     /// A list of extra play options
