@@ -188,6 +188,10 @@ function startGame(){
 }
 
 function play(playerId){
+    // If no card selected, don't execute
+    if (selectedCard < 0) {
+        return;
+    }
     connection.invoke("ReceivePlay", @Model.Id, playerId, selectedCard).catch(function (err) {
         return console.log(err.toString());
     });
