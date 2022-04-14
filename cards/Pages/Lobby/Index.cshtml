@@ -149,6 +149,9 @@ connection.on("GameUpdate", function (gameData) {
     let playButton = document.createElement("button");
     playButton.innerText = "Play";
     playButton.className = "btn btn-primary";
+    if (!gameData["canPlay"]){
+        playButton.disabled = true;
+    }
     playButton.onclick = function (){
         play(gameData["id"]);
     }

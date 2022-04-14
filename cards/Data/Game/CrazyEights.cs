@@ -225,7 +225,8 @@ public class CrazyEights : IGameService
                 cards,
                 otherPlayersAmountOfCards,
                 GetLastPlayedCard().ToString(),
-                features
+                features,
+                _currentPlayer == i
             ));
         }
 
