@@ -86,4 +86,9 @@ public interface IGameService
     /// <returns></returns>
     public List<IGameFeature> GetExtraOptions();
 
+    /// <summary>
+    /// Representation of the current game, for every user
+    /// </summary>
+    /// <returns>A list of game data with all needed information for a player</returns>
+    public List<GameData> GetGameData();
 }

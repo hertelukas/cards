@@ -57,6 +57,11 @@ public class Lobby
         _players.First(p => p.Username.Equals(username)).ConnectionId = connectionId;
     }
 
+    public string? GetConnectionId(int index)
+    {
+        return _players[index].ConnectionId;
+    }
+
     public bool DisconnectConnection(string connectionId)
     {
         foreach (var player in _players.Where(player =>
@@ -105,5 +110,10 @@ public class Lobby
         }
 
         _game.Initialize(_players.Count);
+    }
+
+    public List<GameData> GetGameData()
+    {
+        return _game.GetGameData();
     }
 }

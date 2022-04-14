@@ -12,6 +12,11 @@ public class Poker
 
         public Suit Suit { get; }
         public Value Value { get; }
+
+        public string ToString()
+        {
+            return Suit + " " + Value;
+        }
     }
 
     public enum Suit

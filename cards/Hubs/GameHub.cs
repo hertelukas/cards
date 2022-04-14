@@ -65,7 +65,18 @@ public class GameHub : Hub
 
     private async Task SendGameUpdateAsync(int lobbyId)
     {
-        await Clients.Group(lobbyId.ToString()).SendAsync("GameUpdate");
+        var lobby = _lobbyService.GetLobby(lobbyId);
+
+        var gameData = lobby.GetGameData();
+
+        for (var i = 0; i < gameData.Count; i++)
+        {
+            var connectionId = lobby.GetConnectionId(i);
+            if (connectionId != null)
+            {
+                await Clients.Client(connectionId).SendAsync("GameUpdate", gameData[i]);
+            }
+        }
     }
 
     #endregion

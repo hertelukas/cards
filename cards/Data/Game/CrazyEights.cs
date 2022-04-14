@@ -191,6 +191,26 @@ public class CrazyEights : IGameService
         return result;
     }
 
+    public List<GameData> GetGameData()
+    {
+        var result = new List<GameData>();
+
+        for (var i = 0; i < _playerCards.Length; i++)
+        {
+            var cards = _playerCards[i].Select(card => card.ToString());
+            var otherPlayersAmountOfCards = new List<int>();
+            
+            for (var j = 1; j < _playerCards.Length; j++)
+            {
+                otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
+            }
+
+            result.Add(new GameData(cards, otherPlayersAmountOfCards, _deck.Peek().ToString()));
+        }
+
+        return result;
+    }
+
     private class ChooseSuit : IGameFeature
     {
         private readonly CrazyEights _game;

@@ -48,6 +48,11 @@
 </div>
 
 <button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
+
+<div id="game">
+    
+</div>
+
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 
 <script >
@@ -55,6 +60,7 @@
 const connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
 const games = ["@Html.Raw(string.Join("\", \"", Enum.GetNames<GameEnum>()))"];
 
+const game = document.getElementById("game");
 const userList = document.getElementById("userList");
 
 // Connect to the hub
@@ -90,10 +96,33 @@ connection.on("SelectedGameUpdate", function(game) {
 
 const dropdown = document.getElementById("gameDropdown");
 const startButton = document.getElementById("startGameButton");
-connection.on("GameUpdate", function () {
-    console.log("Game started");
+connection.on("GameUpdate", function (gameData) {
+    // Delete all children
+    while (game.firstChild){
+        game.removeChild(game.firstChild);
+    }
+    
     dropdown.hidden = true;
     startButton.hidden = true;
+    
+    // My cards
+    for (const card of gameData["cards"]) {
+        let span = document.createElement("span");
+        span.textContent = card;
+        
+        game.appendChild(span);
+    }
+    
+    game.appendChild(document.createElement("br"));
+    
+    // Add the amount of the other players
+    for (const amount of gameData["otherAmount"]) {
+      let span = document.createElement("span");
+      span.textContent = amount;
+      
+      game.appendChild(span);
+      game.appendChild(document.createElement("br"));
+    }
 });
 
 // Send updates
