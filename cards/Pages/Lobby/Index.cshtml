@@ -107,16 +107,10 @@ connection.on("GameUpdate", function (gameData) {
     
     // My cards
     for (const card of gameData["cards"]) {
-        const splitted = card.split(" ");
-        
-        let img = document.createElement("img");
-        img.setAttribute("src", "/icons/suits/" + splitted[0] + ".svg");
-        img.setAttribute("width", "20");
         let tmp = document.createElement("button");
         tmp.classList.add("btn");
         tmp.classList.add("btn-light");
-        tmp.textContent = splitted[1] + " ";
-        tmp.appendChild(img);
+        tmp.innerHTML = card;
         
         game.appendChild(tmp);
     }

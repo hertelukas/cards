@@ -15,7 +15,7 @@ public class Poker
 
         public string ToString()
         {
-            return Suit + " " + Value;
+            return "<img src=/icons/suits/" + Suit + ".svg width=\"20\"</img> " + Value; 
         }
     }
 
