@@ -37,7 +37,6 @@ builder.Services.AddSingleton<ILobbyService, EasyLobbyService>();
 builder.Services.Configure<RouteOptions>(options =>
 {
     options.LowercaseUrls = true;
-    options.LowercaseQueryStrings = true;
 });
 
 // Enable Email sender
