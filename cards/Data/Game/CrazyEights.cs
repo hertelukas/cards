@@ -17,6 +17,7 @@ public class CrazyEights : IGameService
         _deck = new Queue<ICard>();
         _playedCards = new Stack<ICard>();
     }
+
     public string GetTitle()
     {
         return "Crazy Eights";
@@ -226,8 +227,8 @@ public class CrazyEights : IGameService
             }
 
             var topCard = GetLastPlayedCard().ToString();
-            
-            if (((Poker)GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
+
+            if (((Poker) GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
             {
                 topCard += $": <img src=\"/icons/suits/{_wishedColor}.svg\" width=\"20\">";
             }
@@ -238,10 +239,10 @@ public class CrazyEights : IGameService
             result.Add(new GameData(
                 cards,
                 otherPlayersAmountOfCards,
+                (_currentPlayer - i + _playerCards.Length) % _playerCards.Length,
                 topCard,
                 features,
-                featuresEnabled,
-                _currentPlayer == i
+                featuresEnabled
             ));
         }
 

@@ -116,7 +116,22 @@ public class Lobby
 
     public List<GameData> GetGameData()
     {
-        return _game.GetGameData();
+        var result = _game.GetGameData();
+        // Fill in usernames
+        var connectedUsernames = GetConnectedUsernames();
+        for (var i = 0; i < result.Count; i++)
+        {
+            var usernames = new List<string>();
+
+            for (var j = 1; j < result.Count; j++)
+            {
+                usernames.Add(connectedUsernames[(i + j) % result.Count]);
+            }
+
+            result[i].OtherUsernames = usernames;
+        }
+
+        return result;
     }
 
     public void Play(int playerId, int cardIndex)

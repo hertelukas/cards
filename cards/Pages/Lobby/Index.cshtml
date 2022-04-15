@@ -129,11 +129,11 @@ connection.on("GameUpdate", function (gameData) {
         let tmp = document.createElement("button");
         tmp.className = "btn btn-light";
         tmp.innerHTML = gameData["cards"][i];
-        tmp.disabled = !gameData["canPlay"];
+        tmp.disabled = 0 !== gameData["currentPlayer"];
         cardButtons.push(tmp);
         tmp.onclick = function (){
             selectedCard = i;
-            playButton.disabled = !gameData["canPlay"];
+            playButton.disabled = 0 !== gameData["currentPlayer"];
             
             for (let j = 0; j < cardButtons.length; j++) {
                 cardButtons[j].className = "btn btn-light";
@@ -150,9 +150,12 @@ connection.on("GameUpdate", function (gameData) {
     game.appendChild(document.createElement("br"));
     
     // Add the amount of the other players
-    for (const amount of gameData["otherAmount"]) {
+    for (let i = 0; i < gameData["otherAmount"].length; i++) {
       let span = document.createElement("span");
-      span.textContent = amount;
+      span.textContent = gameData["otherUsernames"][i] + ": " + gameData["otherAmount"][i];
+      if (i !== gameData["currentPlayer"] - 1){
+        span.className = "text-muted";
+      }
       
       game.appendChild(span);
       game.appendChild(document.createElement("br"));
