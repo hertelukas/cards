@@ -10,6 +10,7 @@ public class CrazyEights : IGameService
     private int _currentPlayer;
     private Poker.Suit _wishedColor = Poker.Suit.Hearts;
     private bool _hasPlayedEight;
+    private bool _hasTakenCard;
 
     public CrazyEights()
     {
@@ -181,6 +182,8 @@ public class CrazyEights : IGameService
         _playerCards[id].Remove(card);
         _playedCards.Push(card);
 
+        _hasTakenCard = false;
+
         // If no eight played, the game goes on
         if (((Poker) card).ValueProp != Poker.Value.Eight)
         {
@@ -201,7 +204,8 @@ public class CrazyEights : IGameService
             new ChooseSuitFeature(this, Poker.Suit.Hearts),
             new ChooseSuitFeature(this, Poker.Suit.Tiles),
             new ChooseSuitFeature(this, Poker.Suit.Pikes),
-            new TakeCardFeature(this)
+            new TakeCardFeature(this),
+            new DoNothing(this)
         };
 
         return result;
@@ -265,7 +269,7 @@ public class CrazyEights : IGameService
 
         public bool IsExecutable(int player)
         {
-            return _game._currentPlayer == player;
+            return _game._currentPlayer == player && !_game._hasTakenCard && !_game._hasPlayedEight;
         }
 
         public bool Execute(int player)
@@ -274,6 +278,36 @@ public class CrazyEights : IGameService
             if (!IsExecutable(player)) return false;
 
             _game._playerCards[player].Add(_game.TakeCard());
+            _game._hasTakenCard = true;
+            return true;
+        }
+    }
+
+    private class DoNothing : IGameFeature
+    {
+        private readonly CrazyEights _game;
+
+        public DoNothing(CrazyEights game)
+        {
+            _game = game;
+        }
+
+        public string GetName()
+        {
+            return "Skip";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return _game._hasTakenCard && _game._currentPlayer == player;
+        }
+
+        public bool Execute(int player)
+        {
+            if (!IsExecutable(player)) return false;
+
+            _game._currentPlayer = (_game._currentPlayer + 1) % _game._playerCards.Length;
+            _game._hasTakenCard = false;
             return true;
         }
     }
@@ -309,6 +343,7 @@ public class CrazyEights : IGameService
             _game._hasPlayedEight = false;
             _game._wishedColor = _suit;
             _game._currentPlayer = (_game._currentPlayer + 1) % _game._playerCards.Length;
+            _game._hasTakenCard = false;
             return true;
         }
     }
