@@ -1,0 +1,7 @@
+@model NotificationMessageModel
+
+
+<div class="alert alert-dismissible alert-@Model.NotificationLevel.ToString().ToLower()" role="alert">
+    <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
+    @Model.Message
+</div>
