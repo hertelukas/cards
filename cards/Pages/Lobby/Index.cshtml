@@ -114,14 +114,18 @@ connection.on("GameUpdate", function (gameData) {
     currentCard.innerHTML = gameData["topCard"];
     game.appendChild(currentCard);
     
+    let playButton = document.createElement("button");
+    
     // My cards
     for(let i = 0; i < gameData["cards"].length; i++) {
         let tmp = document.createElement("button");
         tmp.className = "btn btn-light";
         tmp.innerHTML = gameData["cards"][i];
+        tmp.disabled = !gameData["canPlay"];
         cardButtons.push(tmp);
         tmp.onclick = function (){
             selectedCard = i;
+            playButton.disabled = !gameData["canPlay"];
             
             for (let j = 0; j < cardButtons.length; j++) {
                 cardButtons[j].className = "btn btn-light";
@@ -146,12 +150,9 @@ connection.on("GameUpdate", function (gameData) {
       game.appendChild(document.createElement("br"));
     }
     
-    let playButton = document.createElement("button");
     playButton.innerText = "Play";
     playButton.className = "btn btn-primary";
-    if (!gameData["canPlay"]){
-        playButton.disabled = true;
-    }
+    playButton.disabled = true;
     playButton.onclick = function (){
         play(gameData["id"]);
     }
