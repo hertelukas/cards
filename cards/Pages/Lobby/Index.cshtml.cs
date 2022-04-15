@@ -18,21 +18,31 @@ public class IndexModel : PageModel
     public int Id { get; set; }
     public Data.Lobby Lobby { get; private set; }
     public string Username { get; private set; }
+
     public IActionResult OnGet(int id)
     {
         Id = id;
-        
+
         // Check whether the user is allowed to access this lobby
         try
         {
             var username = User.Identity?.Name;
+            
+            try
+            {
+                Lobby = _lobbyService.GetLobby(Id);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return RedirectToPage("Create");
+            }
 
             if (!_lobbyService.HasAccess(Id, username ?? throw new NullReferenceException()))
             {
                 return RedirectToPage("Join", new {Id});
             }
 
-            Lobby = _lobbyService.GetLobby(Id);
+
             Username = username;
 
             return Page();
