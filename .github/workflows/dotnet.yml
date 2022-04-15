@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  release:
 
     runs-on: ubuntu-latest
 
@@ -27,3 +27,8 @@ jobs:
       run: dotnet publish --configuration Release
     - name: Compress
       run: tar -czf release.tar.gz /home/runner/work/cards/cards/cards/bin/Release/net6.0/publish/
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release.tar.gz
+    
