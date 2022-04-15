@@ -219,13 +219,20 @@ public class CrazyEights : IGameService
                 otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
             }
 
+            var topCard = GetLastPlayedCard().ToString();
+            
+            if (((Poker.Card)GetLastPlayedCard()).Value == Poker.Value.Eight)
+            {
+                topCard += $": <img src=\"/icons/suits/{_wishedColor}.svg\" width=\"20\">";
+            }
+
             var features = GetExtraOptions().Select(feature => feature.GetName()).ToList();
             var featuresEnabled = GetExtraOptions().Select(feature => feature.IsExecutable(i)).ToList();
 
             result.Add(new GameData(
                 cards,
                 otherPlayersAmountOfCards,
-                GetLastPlayedCard().ToString(),
+                topCard,
                 features,
                 featuresEnabled,
                 _currentPlayer == i
@@ -259,7 +266,7 @@ public class CrazyEights : IGameService
             // Abort if not executable
             if (!IsExecutable(player)) return false;
 
-            _game._playerCards[player].Add(_game._deck.Dequeue());
+            _game._playerCards[player].Add(_game.TakeCard());
             return true;
         }
     }
