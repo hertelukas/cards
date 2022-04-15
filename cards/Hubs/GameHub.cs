@@ -7,16 +7,19 @@ namespace cards.Hubs;
 public class GameHub : Hub
 {
     private readonly ILobbyService _lobbyService;
+    private readonly ILogger<GameHub> _logger;
 
-    public GameHub(ILobbyService lobbyService)
+    public GameHub(ILobbyService lobbyService, ILogger<GameHub> logger)
     {
         _lobbyService = lobbyService;
+        _logger = logger;
     }
 
     #region Connections
 
     public async Task Connect(string username, int lobbyId)
     {
+        _logger.LogInformation("{Username} connected to lobby {Id} with connectionId {ConnectionId}", username, lobbyId, Context.ConnectionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
 
         _lobbyService.SetConnectionId(lobbyId, username, Context.ConnectionId);
@@ -27,6 +30,7 @@ public class GameHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var lobbyId = _lobbyService.DisconnectConnection(Context.ConnectionId);
+        _logger.LogInformation("Connection {ConnectionId} disconnected from {LobbyId}", Context.ConnectionId, lobbyId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
         await SendConnectedUsersUpdateAsync(lobbyId);
         await base.OnDisconnectedAsync(exception);
@@ -44,12 +48,14 @@ public class GameHub : Hub
 
     public async Task ReceiveStartGame(int lobbyId)
     {
+        _logger.LogInformation("Lobby {LobbyId} started a game", lobbyId);
         _lobbyService.GetLobby(lobbyId).StartGame();
         await SendGameUpdateAsync(lobbyId);
     }
 
     public async Task ReceivePlay(int lobbyId, int playerId, int cardIndex)
     {
+        _logger.LogDebug("Player {PlayerId} played card {CardIndex}", playerId, cardIndex);
         _lobbyService.GetLobby(lobbyId).Play(playerId, cardIndex);
         await SendGameUpdateAsync(lobbyId);
     }
@@ -72,11 +78,13 @@ public class GameHub : Hub
 
     private async Task SendSelectedGameAsync(int lobbyId, GameEnum game)
     {
+        _logger.LogInformation("Lobby {LobbyId} selected {Game}", lobbyId, game);
         await Clients.Group(lobbyId.ToString()).SendAsync("SelectedGameUpdate", game);
     }
 
     private async Task SendGameUpdateAsync(int lobbyId)
     {
+        _logger.LogDebug("Lobby {LobbyId} received a game update", lobbyId);
         var lobby = _lobbyService.GetLobby(lobbyId);
 
         var gameData = lobby.GetGameData();
