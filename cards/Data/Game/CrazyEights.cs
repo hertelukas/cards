@@ -7,10 +7,16 @@ public class CrazyEights : IGameService
     private List<ICard>[] _playerCards;
     private Queue<ICard> _deck;
     private Stack<ICard> _playedCards;
-    private int _currentPlayer = 0;
+    private int _currentPlayer;
     private Poker.Suit _wishedColor = Poker.Suit.Hearts;
-    private bool _hasPlayedEight = false;
+    private bool _hasPlayedEight;
 
+    public CrazyEights()
+    {
+        _playerCards = Array.Empty<List<ICard>>();
+        _deck = new Queue<ICard>();
+        _playedCards = new Stack<ICard>();
+    }
     public string GetTitle()
     {
         return "Crazy Eights";
@@ -56,7 +62,7 @@ public class CrazyEights : IGameService
         {
             foreach (var suit in Enum.GetValues<Poker.Suit>())
             {
-                _deck.Enqueue(new Poker.Card(value, suit));
+                _deck.Enqueue(new Poker(value, suit));
             }
         }
     }
@@ -115,17 +121,17 @@ public class CrazyEights : IGameService
 
     public bool IsPlayable(ICard card)
     {
-        var topCard = (Poker.Card) GetLastPlayedCard();
-        var playedCard = (Poker.Card) card;
+        var topCard = (Poker) GetLastPlayedCard();
+        var playedCard = (Poker) card;
 
         // If the last card is an 8, we have to look at the wish
-        if (topCard.Value == Poker.Value.Eight)
+        if (topCard.ValueProp == Poker.Value.Eight)
         {
-            return playedCard.Value == Poker.Value.Eight || playedCard.Suit == _wishedColor;
+            return playedCard.ValueProp == Poker.Value.Eight || playedCard.SuitProp == _wishedColor;
         }
 
-        return topCard.Value == playedCard.Value || topCard.Suit == playedCard.Suit ||
-               playedCard.Value == Poker.Value.Eight;
+        return topCard.ValueProp == playedCard.ValueProp || topCard.SuitProp == playedCard.SuitProp ||
+               playedCard.ValueProp == Poker.Value.Eight;
     }
 
     public ICollection<ICard> Shuffle()
@@ -175,7 +181,7 @@ public class CrazyEights : IGameService
         _playedCards.Push(card);
 
         // If no eight played, the game goes on
-        if (((Poker.Card) card).Value != Poker.Value.Eight)
+        if (((Poker) card).ValueProp != Poker.Value.Eight)
         {
             _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
             _hasPlayedEight = false;
@@ -221,7 +227,7 @@ public class CrazyEights : IGameService
 
             var topCard = GetLastPlayedCard().ToString();
             
-            if (((Poker.Card)GetLastPlayedCard()).Value == Poker.Value.Eight)
+            if (((Poker)GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
             {
                 topCard += $": <img src=\"/icons/suits/{_wishedColor}.svg\" width=\"20\">";
             }

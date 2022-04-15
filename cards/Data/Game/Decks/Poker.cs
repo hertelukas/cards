@@ -1,22 +1,19 @@
 namespace cards.Data.Game.Decks;
 
-public class Poker
+public class Poker : ICard
 {
-    public class Card : ICard
+    public Poker(Value value, Suit suit)
     {
-        public Card(Value value, Suit suit)
-        {
-            Value = value;
-            Suit = suit;
-        }
+        ValueProp = value;
+        SuitProp = suit;
+    }
 
-        public Suit Suit { get; }
-        public Value Value { get; }
+    public Suit SuitProp { get; }
+    public Value ValueProp { get; }
 
-        public string ToString()
-        {
-            return "<img src=/icons/suits/" + Suit + ".svg width=\"20\"</img> " + Value; 
-        }
+    public override string ToString()
+    {
+        return $"<img src=\"/icons/suits/{SuitProp}.svg\" width=\"20\"</img> {ValueProp}";
     }
 
     public enum Suit
