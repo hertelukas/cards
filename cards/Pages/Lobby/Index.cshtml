@@ -8,10 +8,6 @@
 }
 
 @* Connected users offset canvas *@
-<a class="btn btn-primary" data-bs-toggle="offcanvas" href="#connectedUsersCanvas" role="button" aria-controls="connectedUsersCanvas">
-    Connected Users
-</a>
-
 <div class="offcanvas offcanvas-start" tabindex="-1" id="connectedUsersCanvas" aria-labelledby="connectedUsersCanvasLabel">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="connectedUsersCanvasLabel">Connected</h5>
@@ -73,6 +69,18 @@ connection.start().then(function () {
     // TODO handle error
     return console.error(err.toString());
 });
+
+// Show connected users with tab
+
+window.onload = function () {
+    const connectUserCanvas = new bootstrap.Offcanvas(document.getElementById("connectedUsersCanvas"));
+    window.onkeydown = function(event) {
+        if (event.key === "Tab") {
+            event.preventDefault();
+            connectUserCanvas.toggle();
+        }
+    }
+}
 
 // Listen to updates
 connection.on("ConnectedUsersUpdate", function (users) {
