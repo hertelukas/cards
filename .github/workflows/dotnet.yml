@@ -26,4 +26,4 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release
     - name: Compress
-      run: tar -cz release.tar.gz /home/runner/work/cards/cards/cards/bin/Release/net6.0/publish/
+      run: tar -czf release.tar.gz /home/runner/work/cards/cards/cards/bin/Release/net6.0/publish/
