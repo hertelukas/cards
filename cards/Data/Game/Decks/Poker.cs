@@ -11,9 +11,14 @@ public class Poker : ICard
     public Suit SuitProp { get; }
     public Value ValueProp { get; }
 
-    public override string ToString()
+    public string ToHtmlString()
     {
         return $"<img src=\"/icons/suits/{SuitProp}.svg\" width=\"20\"</img> {ValueProp}";
+    }
+
+    public override string ToString()
+    {
+        return $"{SuitProp} {ValueProp}";
     }
 
     public enum Suit
