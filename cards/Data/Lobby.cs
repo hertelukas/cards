@@ -8,7 +8,7 @@ public class Lobby
     private readonly string _password;
     private IGameService _game;
     private readonly List<Player> _players;
-    public bool HasStarted { get; private set; }
+    private bool HasStarted { get; set; }
     public GameEnum SelectedGame { get; private set; }
     public bool HasSelected { get; private set; }
 
