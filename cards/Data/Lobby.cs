@@ -5,6 +5,8 @@ namespace cards.Data;
 
 public class Lobby
 {
+    private readonly ILogger<Lobby> _logger;
+
     private readonly string _password;
     private IGameService _game;
     private readonly List<Player> _players;
@@ -16,6 +18,8 @@ public class Lobby
     {
         _players = new List<Player> {new(username)};
         _password = password;
+
+        _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<Lobby>();
     }
 
     /// <summary>
@@ -26,12 +30,17 @@ public class Lobby
     /// <returns>If the action was successful</returns>
     public Response JoinLobby(string username, string password)
     {
-        if (!_password.Equals(password)) return Response.InvalidPassword;
+        if (!_password.Equals(password))
+        {
+            _logger.LogInformation("{Username} provided a wrong password for lobby", username);
+            return Response.InvalidPassword;
+        }
 
         // Check if player is already in the list
         if (!_players.Exists(p => p.Username.Equals(username)))
         {
             _players.Add(new Player(username));
+            _logger.LogDebug("{Username} added to the lobby's players list", username);
         }
 
         return Response.Success;
@@ -96,6 +105,8 @@ public class Lobby
         if (HasStarted) return;
         HasStarted = true;
 
+        _logger.LogInformation("Game started");
+
         switch (SelectedGame)
         {
             case GameEnum.CrazyEights:
@@ -109,6 +120,8 @@ public class Lobby
         foreach (var player in _players.Where(player => player.ConnectionId == null))
         {
             _players.Remove(player);
+            _logger.LogInformation("Disconnecting {Player} from the lobby, because he's not connected",
+                player.Username);
         }
 
         _game.Initialize(_players.Count);

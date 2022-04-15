@@ -4,6 +4,7 @@ namespace cards.Data.Game;
 
 public class CrazyEights : IGameService
 {
+    private readonly ILogger<CrazyEights> _logger;
     private List<ICard>[] _playerCards;
     private Queue<ICard> _deck;
     private Stack<ICard> _playedCards;
@@ -14,6 +15,7 @@ public class CrazyEights : IGameService
 
     public CrazyEights()
     {
+        _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<CrazyEights>();
         _playerCards = Array.Empty<List<ICard>>();
         _deck = new Queue<ICard>();
         _playedCards = new Stack<ICard>();
@@ -32,6 +34,7 @@ public class CrazyEights : IGameService
 
     public void Initialize(int players)
     {
+        _logger.LogInformation("Initializing Crazy Eights with {Players} players", players);
         _playerCards = new List<ICard>[players];
         InitializeDeck();
         Shuffle();
@@ -73,9 +76,14 @@ public class CrazyEights : IGameService
     {
         for (var i = 0; i < _playerCards.Length; i++)
         {
-            if (_playerCards[i].Count == 0) return i;
+            if (_playerCards[i].Count == 0)
+            {
+                _logger.LogInformation("Player {Winner} won", i);
+                return i;
+            }
         }
 
+        _logger.LogInformation("No winner determined");
         return -1;
     }
 
@@ -87,6 +95,8 @@ public class CrazyEights : IGameService
     public ICard TakeCard()
     {
         var result = _deck.Dequeue();
+
+        _logger.LogInformation("Taking {Card}", result.ToString());
 
         // Shuffle if the deck is now empty
         if (_deck.Count == 0)
@@ -126,6 +136,8 @@ public class CrazyEights : IGameService
         var topCard = (Poker) GetLastPlayedCard();
         var playedCard = (Poker) card;
 
+        _logger.LogDebug("Trying to play {PlayedCard} on top of {TopCard}", playedCard.ToString(), topCard.ToString());
+
         // If the last card is an 8, we have to look at the wish
         if (topCard.ValueProp == Poker.Value.Eight)
         {
@@ -139,8 +151,10 @@ public class CrazyEights : IGameService
     public ICollection<ICard> Shuffle()
     {
         var rnd = new Random();
-
         var n = _deck.Count;
+
+        _logger.LogInformation("Shuffling {Amount} cards", n);
+
         var deckAsList = _deck.ToList();
         while (n > 1)
         {
@@ -160,6 +174,7 @@ public class CrazyEights : IGameService
 
     public void Play(int id, int cardIndex)
     {
+        _logger.LogDebug("{PlayerId} is trying to play his {CardIndex}. card", id, cardIndex);
         // Check whether the player is playing
         if (_currentPlayer != id)
         {
@@ -178,6 +193,8 @@ public class CrazyEights : IGameService
         {
             return;
         }
+
+        _logger.LogInformation("{PlayerId} is playing {Card}", id, card.ToString());
 
         _playerCards[id].Remove(card);
         _playedCards.Push(card);
@@ -213,6 +230,7 @@ public class CrazyEights : IGameService
 
     public void ExecuteFeature(int id, int featureId)
     {
+        _logger.LogDebug("Player {PlayerId} is trying to execute feature {FeatureIndex}", id, featureId);
         GetExtraOptions().ToList()[featureId].Execute(id);
     }
 
@@ -222,7 +240,7 @@ public class CrazyEights : IGameService
 
         for (var i = 0; i < _playerCards.Length; i++)
         {
-            var cards = _playerCards[i].Select(card => card.ToString());
+            var cards = _playerCards[i].Select(card => card.ToHtmlString());
             var otherPlayersAmountOfCards = new List<int>();
 
             for (var j = 1; j < _playerCards.Length; j++)
@@ -230,7 +248,7 @@ public class CrazyEights : IGameService
                 otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
             }
 
-            var topCard = GetLastPlayedCard().ToString();
+            var topCard = GetLastPlayedCard().ToHtmlString();
 
             if (((Poker) GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
             {
