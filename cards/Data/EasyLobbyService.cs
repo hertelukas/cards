@@ -77,7 +77,7 @@ public class EasyLobbyService : ILobbyService
             }
         }
 
-        _logger.LogWarning("{ConnectionId} not connected from any lobby", connectionId);
+        _logger.LogWarning("{ConnectionId} not connected to any lobby", connectionId);
         return -1;
     }
 }

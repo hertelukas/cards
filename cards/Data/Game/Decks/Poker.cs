@@ -13,7 +13,7 @@ public class Poker : ICard
 
     public string ToHtmlString()
     {
-        return $"<img src=\"/icons/suits/{SuitProp}.svg\" width=\"20\"</img> {ValueProp}";
+        return SpanFromSuit(SuitProp) + $" {ValueProp}";
     }
 
     public override string ToString()
@@ -21,12 +21,22 @@ public class Poker : ICard
         return $"{SuitProp} {ValueProp}";
     }
 
+    public static string SpanFromSuit(Suit suit)
+    {
+        if (suit is Suit.Hearts or Suit.Tiles)
+        {
+            return $"<span style=\"font-family:'Suits';color:red;\">&#{0xe900 + suit}</span>";
+        }
+
+        return $"<span style=\"font-family:Suits;\">&#{0xe900 + suit}</span>";
+    }
+
     public enum Suit
     {
-        Hearts,
-        Tiles,
         Clovers,
-        Pikes
+        Hearts,
+        Pikes,
+        Tiles
     }
 
     public enum Value

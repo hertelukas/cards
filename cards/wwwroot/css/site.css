@@ -16,3 +16,8 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+@font-face {
+  font-family: "Suits";
+  src: url("../fonts/suits.ttf");
+}

@@ -1,8 +1,14 @@
 @page "{id:int=-1}"
+@using Newtonsoft.Json
 @model JoinModel
 
 @{
     ViewData["Title"] = "Join";
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <partial name="Shared/_NotificationMessage" model='@(JsonConvert.DeserializeObject<NotificationMessageModel>(TempData["ErrorMessage"].ToString()))'/>
 }
 
 <form asp-page="Lobby/Join">
