@@ -4,24 +4,30 @@ namespace cards.Data.Game;
 
 public interface IGameService
 {
-    /// <summary>
-    /// The name of the game
-    /// </summary>
-    /// <returns>Title of the game</returns>
-    public string GetTitle();
-    
-    /// <summary>
-    /// A description about the game
-    /// </summary>
-    /// <returns>A detailed description about the rules of the game</returns>
-    public string GetDescription();
+    public static string GetTitle(GameEnum gameEnum)
+    {
+        return gameEnum switch
+        {
+            GameEnum.CrazyEights => CrazyEights.GetTitle(),
+            _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
+        };
+    }
+
+    public static string GetDescription(GameEnum gameEnum)
+    {
+        return gameEnum switch
+        {
+            GameEnum.CrazyEights => CrazyEights.GetDescription(),
+            _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
+        };
+    }
 
     /// <summary>
     /// Setup a new game
     /// </summary>
     /// <param name="players">The amount of players in that game</param>
     public void Initialize(int players);
-    
+
     /// <summary>
     /// Get the winner of the current game
     /// </summary>

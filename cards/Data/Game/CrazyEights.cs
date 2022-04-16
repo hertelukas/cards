@@ -21,15 +21,21 @@ public class CrazyEights : IGameService
         _playedCards = new Stack<ICard>();
     }
 
-    public string GetTitle()
+    public static string GetTitle()
     {
         return "Crazy Eights";
     }
 
-    public string GetDescription()
+    public static string GetDescription()
     {
-        // TODO
-        return "Shedding card game for two to seven players";
+        return
+            "Five cards are dealt to each player (or seven in a two-player game). " +
+            "The remaining cards of the deck are placed face down at the center of the table as the stock pile. The top card is then turned face up to start the game as the first card in the discard pile.\n" +
+            "Players discard by matching rank or suit with the top card of the discard pile, starting with the player left of the dealer. " +
+            "They can also play any 8 at any time, which allows them to declare the suit that the next player is to play; that player must then follow the named suit or play another 8. " +
+            "If a player is unable to play, that player draws cards from the stock pile. He can still play a card or skip his turn. " +
+            "A player may draw from the stock pile at any time, even when holding one or more playable cards.\n\n" +
+            "Source: Wikipedia";
     }
 
     public void Initialize(int players)
@@ -45,10 +51,11 @@ public class CrazyEights : IGameService
             _playerCards[i] = new List<ICard>();
         }
 
+        var cardsPerPlayer = players <= 2 ? 7 : 5;
         // Give every player 5 cards
         foreach (var hand in _playerCards)
         {
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < cardsPerPlayer; i++)
             {
                 hand.Add(TakeCard());
             }

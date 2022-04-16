@@ -45,6 +45,8 @@
 
 <button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
 
+<p id="gameDescription" hidden></p>
+
 <div id="game">
     
 </div>
@@ -54,7 +56,6 @@
 <script >
 "use strict"
 const connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
-const games = ["@Html.Raw(string.Join("\", \"", Enum.GetNames<GameEnum>()))"];
 
 const game = document.getElementById("game");
 const userList = document.getElementById("userList");
@@ -98,8 +99,11 @@ connection.on("ConnectedUsersUpdate", function (users) {
 });
 
 const selectDropdownButton = document.getElementById("selectGameDropdownButton");
-connection.on("SelectedGameUpdate", function(game) {
-    selectDropdownButton.innerText = games[game];
+const descriptionParagraph = document.getElementById("gameDescription");
+connection.on("SelectedGameUpdate", function(game, description) {
+    selectDropdownButton.innerText = game;
+    descriptionParagraph.innerText = description;
+    descriptionParagraph.hidden = false;
 });
 
 const dropdown = document.getElementById("gameDropdown");
@@ -107,6 +111,9 @@ const startButton = document.getElementById("startGameButton");
 let selectedCard = -1;
 let cardButtons = [];
 connection.on("GameUpdate", function (gameData) {
+    
+    descriptionParagraph.hidden = true;
+    
     // Delete all children
     while (game.firstChild){
         game.removeChild(game.firstChild);
