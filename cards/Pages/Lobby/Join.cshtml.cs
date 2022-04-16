@@ -5,16 +5,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 
+#nullable disable
+
 namespace cards.Pages.Lobby;
 
 [Authorize]
 public class JoinModel : PageModel
 {
     private readonly ILobbyService _lobbyService;
+    private readonly ILogger<JoinModel> _logger;
 
-    public JoinModel(ILobbyService lobbyService)
+    public JoinModel(ILobbyService lobbyService, ILogger<JoinModel> logger)
     {
         _lobbyService = lobbyService;
+        _logger = logger;
     }
 
     [BindProperty] public InputModel Input { get; set; }
@@ -38,9 +42,14 @@ public class JoinModel : PageModel
             switch (_lobbyService.JoinLobby(Input.Id, Input.Password, username ?? throw new NullReferenceException()))
             {
                 case Data.Response.Success:
-                    return RedirectToPage("Index", new {Input.Id});
+                    if (!_lobbyService.GetLobby(Input.Id).HasStarted) return RedirectToPage("Index", new {Input.Id});
+
+                    _logger.LogInformation("{Username} tried to join {LobbyId}, but lobby already started",
+                        username, Input.Id);
+                    error = new NotificationMessageModel(NotificationMessageModel.Level.Danger,
+                        "Lobby already started");
+                    break;
                 case Data.Response.NotFound:
-                    Console.WriteLine("Not found");
                     error =
                         new NotificationMessageModel(NotificationMessageModel.Level.Danger, "Lobby not found");
                     break;

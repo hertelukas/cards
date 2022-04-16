@@ -2,6 +2,9 @@ using cards.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Newtonsoft.Json;
+
+#nullable disable
 
 namespace cards.Pages.Lobby;
 
@@ -19,6 +22,8 @@ public class IndexModel : PageModel
     public Data.Lobby Lobby { get; private set; }
     public string Username { get; private set; }
 
+    [TempData] public string ErrorMessage { get; set; }
+
     public IActionResult OnGet(int id)
     {
         Id = id;
@@ -27,7 +32,7 @@ public class IndexModel : PageModel
         try
         {
             var username = User.Identity?.Name;
-            
+
             try
             {
                 Lobby = _lobbyService.GetLobby(Id);
@@ -39,9 +44,11 @@ public class IndexModel : PageModel
 
             if (!_lobbyService.HasAccess(Id, username ?? throw new NullReferenceException()))
             {
+                ErrorMessage = JsonConvert.SerializeObject(new NotificationMessageModel(
+                    NotificationMessageModel.Level.Danger,
+                    "You are not allowed to access this lobby"));
                 return RedirectToPage("Join", new {Id});
             }
-
 
             Username = username;
 
