@@ -24,6 +24,11 @@ public class CreateModel : PageModel
 
     public IActionResult OnPost()
     {
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+
         try
         {
             var username = User.Identity?.Name;
@@ -45,7 +50,7 @@ public class CreateModel : PageModel
         [Required]
         [DataType(DataType.Password)]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.",
-            MinimumLength = 6)]
+            MinimumLength = 2)]
         [Display(Name = "Password for joining the lobby")]
         public string Password { get; set; }
     }
