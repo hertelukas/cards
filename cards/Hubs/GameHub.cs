@@ -19,13 +19,20 @@ public class GameHub : Hub
 
     public async Task Connect(string username, int lobbyId)
     {
-        _logger.LogInformation("{Username} connected to lobby {Id} with connectionId {ConnectionId}", username, lobbyId,
+        _logger.LogInformation("{Username} connected to lobby {LobbyId} with connectionId {ConnectionId}", username,
+            lobbyId,
             Context.ConnectionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
 
         _lobbyService.SetConnectionId(lobbyId, username, Context.ConnectionId);
 
         await SendConnectedUsersUpdateAsync(lobbyId);
+
+        if (_lobbyService.GetLobby(lobbyId).HasStarted)
+        {
+            _logger.LogInformation("Lobby {LobbyId} has already started, sending game update", lobbyId);
+            await SendGameUpdateAsync(lobbyId);
+        }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
