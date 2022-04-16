@@ -19,7 +19,8 @@ public class GameHub : Hub
 
     public async Task Connect(string username, int lobbyId)
     {
-        _logger.LogInformation("{Username} connected to lobby {Id} with connectionId {ConnectionId}", username, lobbyId, Context.ConnectionId);
+        _logger.LogInformation("{Username} connected to lobby {Id} with connectionId {ConnectionId}", username, lobbyId,
+            Context.ConnectionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
 
         _lobbyService.SetConnectionId(lobbyId, username, Context.ConnectionId);
@@ -31,6 +32,13 @@ public class GameHub : Hub
     {
         var lobbyId = _lobbyService.DisconnectConnection(Context.ConnectionId);
         _logger.LogInformation("Connection {ConnectionId} disconnected from {LobbyId}", Context.ConnectionId, lobbyId);
+
+        if (lobbyId < 0)
+        {
+            _logger.LogWarning("Connection {ConnectionId} was not connected to any lobby", Context.ConnectionId);
+            return;
+        }
+
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
         await SendConnectedUsersUpdateAsync(lobbyId);
         await base.OnDisconnectedAsync(exception);
