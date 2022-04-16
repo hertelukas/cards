@@ -1,12 +1,51 @@
 @page "{id:int}"
 @using cards.Data.Game
-@using Humanizer
 @model IndexModel
 
 @{
     ViewData["Title"] = "Lobby " + Model.Id;
 }
 
+<div class="row gx-3">
+    <div class="col">
+        <div id="gameDropdown" class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button"
+                    id="selectGameDropdownButton" data-bs-toggle="dropdown"
+                    aria-expanded="false">
+                @if (Model.Lobby.HasSelected)
+                {
+                    <span>
+                        @(IGameService.GetTitle(Model.Lobby.SelectedGame))
+                    </span>
+                }
+                else
+                {
+                    <span>Select Game</span>
+                }
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="selectGameDropdownButton" id="selectableGamesList">
+                @foreach (var game in Enum.GetValues<GameEnum>())
+                {
+                    <li>
+                        <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@(IGameService.GetTitle(game))</button>
+                    </li>
+                }
+            </ul>
+        </div>
+        <br>
+        <button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
+    </div>
+
+    <div class="col-8">
+        <p id="gameDescription">
+            @if (Model.Lobby.HasSelected)
+            {
+                @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
+            }
+        </p>
+    </div>
+
+</div>
 @* Connected users offset canvas *@
 <div class="offcanvas offcanvas-start" tabindex="-1" id="connectedUsersCanvas" aria-labelledby="connectedUsersCanvasLabel">
     <div class="offcanvas-header">
@@ -20,43 +59,12 @@
     </div>
 </div>
 
-<div id="gameDropdown" class="dropdown">
-    <button class="btn btn-secondary dropdown-toggle" type="button"
-            id="selectGameDropdownButton" data-bs-toggle="dropdown"
-            aria-expanded="false">
-        @if (Model.Lobby.HasSelected)
-        {
-            <span>
-                @(IGameService.GetTitle(Model.Lobby.SelectedGame))
-            </span>
-        }
-        else
-        {
-            <span>Select Game</span>
-        }
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="selectGameDropdownButton" id="selectableGamesList">
-        @foreach (var game in Enum.GetValues<GameEnum>())
-        {
-            <li>
-                <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@(IGameService.GetTitle(game))</button>
-            </li>
-        }
-    </ul>
+<div class="row">
+    <div id="game">
+
+    </div>
 </div>
 
-<button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
-
-<p id="gameDescription">
-    @if (Model.Lobby.HasSelected)
-    {
-        @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
-    }
-</p>
-
-<div id="game">
-
-</div>
 
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
 
@@ -134,6 +142,7 @@ connection.on("GameUpdate", function (gameData) {
     
     let currentCard = document.createElement("h1");
     currentCard.innerHTML = gameData["topCard"];
+    currentCard.className = "display-4";
     game.appendChild(currentCard);
     
     let playButton = document.createElement("button");
@@ -141,7 +150,7 @@ connection.on("GameUpdate", function (gameData) {
     // My cards
     for(let i = 0; i < gameData["cards"].length; i++) {
         let tmp = document.createElement("button");
-        tmp.className = "btn btn-light";
+        tmp.className = "btn btn-light game-card";
         tmp.innerHTML = gameData["cards"][i];
         tmp.disabled = 0 !== gameData["currentPlayer"];
         cardButtons.push(tmp);
@@ -150,10 +159,10 @@ connection.on("GameUpdate", function (gameData) {
             playButton.disabled = 0 !== gameData["currentPlayer"];
             
             for (let j = 0; j < cardButtons.length; j++) {
-                cardButtons[j].className = "btn btn-light";
+                cardButtons[j].className = "btn btn-light game-card";
                 
                 if (i === j) {
-                    cardButtons[j].className = "btn btn-dark";
+                    cardButtons[j].className = "btn btn-dark game-card";
                 }
             }
         };
@@ -175,8 +184,10 @@ connection.on("GameUpdate", function (gameData) {
       game.appendChild(document.createElement("br"));
     }
     
+    game.appendChild(document.createElement("hr"));
+    
     playButton.innerText = "Play";
-    playButton.className = "btn btn-primary";
+    playButton.className = "btn btn-primary game-card";
     playButton.disabled = true;
     playButton.onclick = function (){
         play(gameData["id"]);
@@ -187,7 +198,7 @@ connection.on("GameUpdate", function (gameData) {
     for (let i = 0; i < gameData["features"].length; i++) {
         let button = document.createElement("button");
         button.innerHTML = gameData["features"][i];
-        button.className = "btn btn-primary";
+        button.className = "btn btn-primary game-card";
         
         button.hidden = !gameData["featureEnabled"][i];
         
