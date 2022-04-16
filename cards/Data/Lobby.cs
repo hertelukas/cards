@@ -112,6 +112,9 @@ public class Lobby
             case GameEnum.CrazyEights:
                 _game = new CrazyEights();
                 break;
+            case GameEnum.CrazyEightsVariation:
+                _game = new CrazyEightsVariation();
+                break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null);
         }
