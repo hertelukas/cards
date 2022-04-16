@@ -72,6 +72,12 @@ public class GameHub : Hub
     {
         _logger.LogDebug("Player {PlayerId} played card {CardIndex}", playerId, cardIndex);
         _lobbyService.GetLobby(lobbyId).Play(playerId, cardIndex);
+
+        if (_lobbyService.GetLobby(lobbyId).HandleWinner())
+        {
+            SendRoundWinnerAsync(lobbyId);
+        }
+
         await SendGameUpdateAsync(lobbyId);
     }
 
@@ -113,6 +119,14 @@ public class GameHub : Hub
                 await Clients.Client(connectionId).SendAsync("GameUpdate", gameData[i]);
             }
         }
+    }
+
+    private async Task SendRoundWinnerAsync(int lobbyId)
+    {
+        _logger.LogInformation("Lobby {LobbyId} has finished one round", lobbyId);
+
+        await Clients.Group(lobbyId.ToString())
+            .SendAsync("RoundWinner", _lobbyService.GetLobby(lobbyId).GetLeaderboard());
     }
 
     #endregion

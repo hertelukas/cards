@@ -50,6 +50,18 @@ public interface IGameService
     public ICard TakeCard();
 
     /// <summary>
+    /// Calculate points
+    /// </summary>
+    /// <returns>The points for this round for every user</returns>
+    public List<int> CalcPoints();
+
+    /// <summary>
+    /// Meaning of points
+    /// </summary>
+    /// <returns>Whether having a lot of points is good</returns>
+    public bool PointsAreGood();
+
+    /// <summary>
     /// Get the hand of a player
     /// </summary>
     /// <param name="id">The id of the player</param>

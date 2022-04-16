@@ -60,8 +60,14 @@
 </div>
 
 <div class="row">
-    <div id="game">
+    <div class="col-8" id="game">
 
+    </div>
+    <div class="col" id="leaderboardCol" hidden>
+        <h1 class="display-4">Leaderboard</h1>
+        <ol id="leaderboard">
+
+        </ol>
     </div>
 </div>
 
@@ -209,6 +215,24 @@ connection.on("GameUpdate", function (gameData) {
         game.appendChild(button);
     }
 });
+
+const leaderboard = document.getElementById("leaderboard");
+const leaderboardCol = document.getElementById("leaderboardCol");
+connection.on("RoundWinner", function(leaderboardData) {
+    // Clear all children
+    while (leaderboard.firstChild){
+        leaderboard.removeChild(leaderboard.firstChild);    
+    }
+    
+    leaderboardCol.hidden = false;
+    
+    for (const player of leaderboardData["players"]) {
+      let user = document.createElement("li");
+      user.innerText = `${player["username"]}: ${player["points"]}`;
+      
+      leaderboard.appendChild(user);
+    }
+})
 
 // Send updates
 // React to game selection

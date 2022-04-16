@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using cards.Data.Game.Decks;
 
 namespace cards.Data.Game.Implementations;
@@ -122,6 +123,39 @@ public class CrazyEights : IGameService
         }
 
         return result;
+    }
+
+    public List<int> CalcPoints()
+    {
+        var winner = GetWinner();
+
+        var sum = PlayerCards.Sum(h => h.Sum(c =>
+            {
+                return ((Poker) c).ValueProp switch
+                {
+                    Poker.Value.Eight => 50,
+                    Poker.Value.Jack => 10,
+                    Poker.Value.Queen => 10,
+                    Poker.Value.King => 10,
+                    Poker.Value.Ace => 10,
+                    _ => (int) ((Poker) c).ValueProp + 1
+                };
+            }
+        ));
+
+        var result = new List<int>();
+
+        for (var i = 0; i < PlayerCards.Length; i++)
+        {
+            result.Add(i == winner ? sum : 0);
+        }
+
+        return result;
+    }
+
+    public bool PointsAreGood()
+    {
+        return true;
     }
 
     public ICollection<ICard> GetHand(int id)
