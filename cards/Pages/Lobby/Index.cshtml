@@ -102,7 +102,7 @@ const selectDropdownButton = document.getElementById("selectGameDropdownButton")
 const descriptionParagraph = document.getElementById("gameDescription");
 connection.on("SelectedGameUpdate", function(game, description) {
     selectDropdownButton.innerText = game;
-    descriptionParagraph.innerText = description;
+    descriptionParagraph.innerHTML = description;
     descriptionParagraph.hidden = false;
 });
 

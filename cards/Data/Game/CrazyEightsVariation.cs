@@ -17,11 +17,11 @@ public class CrazyEightsVariation : CrazyEights
     public static string GetDescription()
     {
         return
-            "Crazy Eights with extra rules:\n" +
-            "Queens skip: Playing a Queen causes the next player to miss their turn.\n" +
-            "Aces reverse direction: Playing an Ace reverses the direction of play.\n" +
-            "Draw 2: Playing a two forces the next player to draw two cards, unless they can play another two. Multiple twos \"stack\"; if a two is played in response to a two, the next player must draw four.\n\n" +
-            "Source: Wikipedia";
+            "Crazy Eights with extra rules:<br>" +
+            "<b>Queens skip:</b> Playing a Queen causes the next player to miss their turn.<br>" +
+            "<b>Aces reverse direction:</b> Playing an Ace reverses the direction of play.<br>" +
+            "<b>Draw 2:</b> Playing a two forces the next player to draw two cards, unless they can play another two. Multiple twos \"stack\"; if a two is played in response to a two, the next player must draw four.<br>" +
+            "<i>Source: Wikipedia</i>";
     }
 
     public CrazyEightsVariation()
