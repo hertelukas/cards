@@ -1,6 +1,6 @@
 using cards.Data.Game.Decks;
 
-namespace cards.Data.Game;
+namespace cards.Data.Game.Implementations;
 
 public class CrazyEightsVariation : CrazyEights
 {
