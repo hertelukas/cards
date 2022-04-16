@@ -9,6 +9,7 @@ public interface IGameService
         return gameEnum switch
         {
             GameEnum.CrazyEights => CrazyEights.GetTitle(),
+            GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetTitle(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }
@@ -18,6 +19,7 @@ public interface IGameService
         return gameEnum switch
         {
             GameEnum.CrazyEights => CrazyEights.GetDescription(),
+            GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetDescription(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }
@@ -91,6 +93,11 @@ public interface IGameService
     /// </summary>
     /// <returns></returns>
     public IEnumerable<IGameFeature> GetExtraOptions();
+
+    /// <summary>
+    /// Next players turn
+    /// </summary>
+    public void NextPlayer();
 
     /// <summary>
     /// Executes a feature, does nothing if fails
