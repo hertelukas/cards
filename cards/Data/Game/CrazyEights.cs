@@ -252,7 +252,7 @@ public class CrazyEights : IGameService
 
             if (((Poker) GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
             {
-                topCard += $": <img src=\"/icons/suits/{_wishedColor}.svg\" width=\"20\">";
+                topCard += $": {Poker.SpanFromSuit(_wishedColor)}";
             }
 
             var features = GetExtraOptions().Select(feature => feature.GetName()).ToList();
@@ -343,7 +343,7 @@ public class CrazyEights : IGameService
 
         public string GetName()
         {
-            return "Choose <img src=/icons/suits/" + _suit + ".svg width =\"20\"</img>";
+            return $"Choose {Poker.SpanFromSuit(_suit)}";
         }
 
         public bool IsExecutable(int player)
