@@ -26,7 +26,9 @@
             aria-expanded="false">
         @if (Model.Lobby.HasSelected)
         {
-            <span>@Model.Lobby.SelectedGame</span>
+            <span>
+                @(IGameService.GetTitle(Model.Lobby.SelectedGame))
+            </span>
         }
         else
         {
@@ -37,7 +39,7 @@
         @foreach (var game in Enum.GetValues<GameEnum>())
         {
             <li>
-                <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@game.Humanize()</button>
+                <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@(IGameService.GetTitle(game))</button>
             </li>
         }
     </ul>
@@ -45,10 +47,15 @@
 
 <button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
 
-<p id="gameDescription" hidden></p>
+<p id="gameDescription">
+    @if (Model.Lobby.HasSelected)
+    {
+        @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
+    }
+</p>
 
 <div id="game">
-    
+
 </div>
 
 <script src="~/js/signalr/dist/browser/signalr.min.js"></script>
@@ -101,7 +108,7 @@ connection.on("ConnectedUsersUpdate", function (users) {
 const selectDropdownButton = document.getElementById("selectGameDropdownButton");
 const descriptionParagraph = document.getElementById("gameDescription");
 connection.on("SelectedGameUpdate", function(game, description) {
-    selectDropdownButton.innerText = game;
+    selectDropdownButton.innerHTML = `<span>${game} </span>`;
     descriptionParagraph.innerHTML = description;
     descriptionParagraph.hidden = false;
 });
