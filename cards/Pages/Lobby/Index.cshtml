@@ -175,7 +175,7 @@ connection.on("GameUpdate", function (gameData) {
         button.innerHTML = gameData["features"][i];
         button.className = "btn btn-primary";
         
-        button.disabled = !gameData["featureEnabled"][i];
+        button.hidden = !gameData["featureEnabled"][i];
         
         button.onclick = function () {
             feature(gameData["id"], i);
