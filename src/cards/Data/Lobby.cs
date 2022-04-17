@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using cards.Data.Game;
+using cards.Data.Game.Implementations;
 
 namespace cards.Data;
 
@@ -99,10 +100,10 @@ public class Lobby
         SelectedGame = game;
     }
 
-    public void StartGame()
+    public void StartGame(bool force = false)
     {
         // If game started, nothing will happen
-        if (HasStarted) return;
+        if (HasStarted && !force) return;
         HasStarted = true;
 
         _logger.LogInformation("Game started");
@@ -111,6 +112,9 @@ public class Lobby
         {
             case GameEnum.CrazyEights:
                 _game = new CrazyEights();
+                break;
+            case GameEnum.CrazyEightsVariation:
+                _game = new CrazyEightsVariation();
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null);
@@ -152,8 +156,62 @@ public class Lobby
         _game.Play(playerId, cardIndex);
     }
 
+    public bool HandleWinner()
+    {
+        if (_game.GetWinner() < 0)
+            return false;
+
+
+        var points = _game.CalcPoints();
+        for (var i = 0; i < points.Count; i++)
+        {
+            _players[i].Points += points[i];
+        }
+
+        StartGame(true);
+
+        return true;
+    }
+
+    public Leaderboard GetLeaderboard()
+    {
+        return new Leaderboard(_players, _game.PointsAreGood());
+    }
+
     public void ExecuteFeature(int playerId, int featureId)
     {
         _game.ExecuteFeature(playerId, featureId);
+    }
+
+    public class Leaderboard
+    {
+        // Hides connectionId from client
+        public class SimplePlayer
+        {
+            public SimplePlayer(string username, int points)
+            {
+                Username = username;
+                Points = points;
+            }
+
+            public string Username { get; }
+            public int Points { get; }
+        }
+
+        public List<SimplePlayer> Players { get; }
+
+        public Leaderboard(IEnumerable<Player> players, bool pointsGood)
+        {
+            Players = new List<SimplePlayer>();
+            
+            foreach (var player in players)
+            {
+                Players.Add(new SimplePlayer(player.Username, player.Points));
+            }
+
+            Players.Sort((player, player1) => pointsGood
+                ? player1.Points.CompareTo(player.Points)
+                : player.Points.CompareTo(player1.Points));
+        }
     }
 }

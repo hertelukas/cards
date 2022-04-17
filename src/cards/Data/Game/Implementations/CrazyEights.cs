@@ -1,54 +1,61 @@
 using cards.Data.Game.Decks;
 
-namespace cards.Data.Game;
+namespace cards.Data.Game.Implementations;
 
 public class CrazyEights : IGameService
 {
     private readonly ILogger<CrazyEights> _logger;
-    private List<ICard>[] _playerCards;
+    protected List<ICard>[] PlayerCards;
     private Queue<ICard> _deck;
     private Stack<ICard> _playedCards;
-    private int _currentPlayer;
+    protected int CurrentPlayer;
     private Poker.Suit _wishedColor = Poker.Suit.Hearts;
-    private bool _hasPlayedEight;
-    private bool _hasTakenCard;
+    protected bool HasPlayedEight;
+    protected bool HasTakenCard;
 
     public CrazyEights()
     {
         _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<CrazyEights>();
-        _playerCards = Array.Empty<List<ICard>>();
+        PlayerCards = Array.Empty<List<ICard>>();
         _deck = new Queue<ICard>();
         _playedCards = new Stack<ICard>();
     }
 
-    public string GetTitle()
+    public static string GetTitle()
     {
         return "Crazy Eights";
     }
 
-    public string GetDescription()
+    public static string GetDescription()
     {
-        // TODO
-        return "Shedding card game for two to seven players";
+        return
+            "Five cards are dealt to each player (or seven in a two-player game). " +
+            "The remaining cards of the deck are placed face down at the center of the table as the stock pile. The top card is then turned face up to start the game as the first card in the discard pile.<br>" +
+            "<b>Players discard by matching rank or suit with the top card of the discard pile.</b> " +
+            "They can also <b>play any 8 at any time, which allows them to declare the suit that the next player is to play;</b> that player must then follow the named suit or play another 8. " +
+            "If a player is unable to play, that player draws cards from the stock pile. He can still play a card or skip his turn. " +
+            "A player may draw from the stock pile at any time, even when holding one or more playable cards.<br>" +
+            "<i>Source: Wikipedia</i>";
     }
 
     public void Initialize(int players)
     {
         _logger.LogInformation("Initializing Crazy Eights with {Players} players", players);
-        _playerCards = new List<ICard>[players];
+        PlayerCards = new List<ICard>[players];
         InitializeDeck();
         Shuffle();
 
         // Initialize player cards
-        for (var i = 0; i < _playerCards.Length; i++)
+        for (var i = 0; i < PlayerCards.Length; i++)
         {
-            _playerCards[i] = new List<ICard>();
+            PlayerCards[i] = new List<ICard>();
         }
 
+        var cardsPerPlayer = players <= 2 ? 7 : 5;
         // Give every player 5 cards
-        foreach (var hand in _playerCards)
+        foreach (var hand in PlayerCards)
         {
-            for (var i = 0; i < 5; i++)
+            for (var i = 0; i < cardsPerPlayer; i++)
             {
                 hand.Add(TakeCard());
             }
@@ -74,9 +81,9 @@ public class CrazyEights : IGameService
 
     public int GetWinner()
     {
-        for (var i = 0; i < _playerCards.Length; i++)
+        for (var i = 0; i < PlayerCards.Length; i++)
         {
-            if (_playerCards[i].Count == 0)
+            if (PlayerCards[i].Count == 0)
             {
                 _logger.LogInformation("Player {Winner} won", i);
                 return i;
@@ -89,7 +96,7 @@ public class CrazyEights : IGameService
 
     public int GetCurrentPlayer()
     {
-        return _currentPlayer;
+        return CurrentPlayer;
     }
 
     public ICard TakeCard()
@@ -117,9 +124,42 @@ public class CrazyEights : IGameService
         return result;
     }
 
+    public List<int> CalcPoints()
+    {
+        var winner = GetWinner();
+
+        var sum = PlayerCards.Sum(h => h.Sum(c =>
+            {
+                return ((Poker) c).ValueProp switch
+                {
+                    Poker.Value.Eight => 50,
+                    Poker.Value.Jack => 10,
+                    Poker.Value.Queen => 10,
+                    Poker.Value.King => 10,
+                    Poker.Value.Ace => 10,
+                    _ => (int) ((Poker) c).ValueProp + 1
+                };
+            }
+        ));
+
+        var result = new List<int>();
+
+        for (var i = 0; i < PlayerCards.Length; i++)
+        {
+            result.Add(i == winner ? sum : 0);
+        }
+
+        return result;
+    }
+
+    public bool PointsAreGood()
+    {
+        return true;
+    }
+
     public ICollection<ICard> GetHand(int id)
     {
-        return _playerCards[id];
+        return PlayerCards[id];
     }
 
     public ICollection<ICard> GetPlayableCards(int id)
@@ -172,44 +212,52 @@ public class CrazyEights : IGameService
         return _playedCards.Peek();
     }
 
-    public void Play(int id, int cardIndex)
+    // Checks if the card can be played and if the user owns the card
+    protected bool CanPlay(int id, int cardIndex)
     {
         _logger.LogDebug("{PlayerId} is trying to play his {CardIndex}. card", id, cardIndex);
         // Check whether the player is playing
-        if (_currentPlayer != id)
+        if (CurrentPlayer != id)
         {
-            return;
+            return false;
         }
 
         // Check whether the player owns this card
-        if (_playerCards[id].Count < cardIndex)
+        if (PlayerCards[id].Count < cardIndex)
+        {
+            return false;
+        }
+
+        var card = PlayerCards[id][cardIndex];
+
+        // Check whether the card is playable
+        return IsPlayable(card);
+    }
+
+    public virtual void Play(int id, int cardIndex)
+    {
+        if (!CanPlay(id, cardIndex))
         {
             return;
         }
 
-        var card = _playerCards[id][cardIndex];
-        // Check whether the card is playable
-        if (!IsPlayable(card))
-        {
-            return;
-        }
+        var card = PlayerCards[id][cardIndex];
 
         _logger.LogInformation("{PlayerId} is playing {Card}", id, card.ToString());
 
-        _playerCards[id].Remove(card);
+        PlayerCards[id].Remove(card);
         _playedCards.Push(card);
 
-        _hasTakenCard = false;
+        HasTakenCard = false;
 
         // If no eight played, the game goes on
         if (((Poker) card).ValueProp != Poker.Value.Eight)
         {
-            _currentPlayer = (_currentPlayer + 1) % _playerCards.Length;
-            _hasPlayedEight = false;
+            NextPlayer();
         }
         else
         {
-            _hasPlayedEight = true;
+            HasPlayedEight = true;
         }
     }
 
@@ -228,6 +276,13 @@ public class CrazyEights : IGameService
         return result;
     }
 
+    public virtual void NextPlayer()
+    {
+        CurrentPlayer = (CurrentPlayer + 1) % PlayerCards.Length;
+        HasPlayedEight = false;
+        HasTakenCard = false;
+    }
+
     public void ExecuteFeature(int id, int featureId)
     {
         _logger.LogDebug("Player {PlayerId} is trying to execute feature {FeatureIndex}", id, featureId);
@@ -238,14 +293,14 @@ public class CrazyEights : IGameService
     {
         var result = new List<GameData>();
 
-        for (var i = 0; i < _playerCards.Length; i++)
+        for (var i = 0; i < PlayerCards.Length; i++)
         {
-            var cards = _playerCards[i].Select(card => card.ToHtmlString());
+            var cards = PlayerCards[i].Select(card => card.ToHtmlString());
             var otherPlayersAmountOfCards = new List<int>();
 
-            for (var j = 1; j < _playerCards.Length; j++)
+            for (var j = 1; j < PlayerCards.Length; j++)
             {
-                otherPlayersAmountOfCards.Add(_playerCards[(i + j) % _playerCards.Length].Count);
+                otherPlayersAmountOfCards.Add(PlayerCards[(i + j) % PlayerCards.Length].Count);
             }
 
             var topCard = GetLastPlayedCard().ToHtmlString();
@@ -261,7 +316,7 @@ public class CrazyEights : IGameService
             result.Add(new GameData(
                 cards,
                 otherPlayersAmountOfCards,
-                (_currentPlayer - i + _playerCards.Length) % _playerCards.Length,
+                (CurrentPlayer - i + PlayerCards.Length) % PlayerCards.Length,
                 topCard,
                 features,
                 featuresEnabled
@@ -287,7 +342,7 @@ public class CrazyEights : IGameService
 
         public bool IsExecutable(int player)
         {
-            return _game._currentPlayer == player && !_game._hasTakenCard && !_game._hasPlayedEight;
+            return _game.CurrentPlayer == player && !_game.HasTakenCard && !_game.HasPlayedEight;
         }
 
         public bool Execute(int player)
@@ -295,8 +350,8 @@ public class CrazyEights : IGameService
             // Abort if not executable
             if (!IsExecutable(player)) return false;
 
-            _game._playerCards[player].Add(_game.TakeCard());
-            _game._hasTakenCard = true;
+            _game.PlayerCards[player].Add(_game.TakeCard());
+            _game.HasTakenCard = true;
             return true;
         }
     }
@@ -317,15 +372,14 @@ public class CrazyEights : IGameService
 
         public bool IsExecutable(int player)
         {
-            return _game._hasTakenCard && _game._currentPlayer == player;
+            return _game.HasTakenCard && _game.CurrentPlayer == player;
         }
 
         public bool Execute(int player)
         {
             if (!IsExecutable(player)) return false;
 
-            _game._currentPlayer = (_game._currentPlayer + 1) % _game._playerCards.Length;
-            _game._hasTakenCard = false;
+            _game.NextPlayer();
             return true;
         }
     }
@@ -349,7 +403,7 @@ public class CrazyEights : IGameService
         public bool IsExecutable(int player)
         {
             // If the player isn't playing or did not play an eight, he can't choose a suit
-            return _game._currentPlayer == player && _game._hasPlayedEight;
+            return _game.CurrentPlayer == player && _game.HasPlayedEight;
         }
 
         public bool Execute(int player)
@@ -358,10 +412,9 @@ public class CrazyEights : IGameService
             if (!IsExecutable(player)) return false;
 
             // The next player has not played the eight
-            _game._hasPlayedEight = false;
+            _game.HasPlayedEight = false;
             _game._wishedColor = _suit;
-            _game._currentPlayer = (_game._currentPlayer + 1) % _game._playerCards.Length;
-            _game._hasTakenCard = false;
+            _game.NextPlayer();
             return true;
         }
     }

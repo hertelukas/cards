@@ -58,7 +58,7 @@ public class GameHub : Hub
     public async Task ReceiveSelectGame(int lobbyId, GameEnum game)
     {
         _lobbyService.GetLobby(lobbyId).SelectGame(game);
-        await SendSelectedGameAsync(lobbyId, game);
+        await SendSelectedGameAsync(lobbyId, IGameService.GetTitle(game), IGameService.GetDescription(game));
     }
 
     public async Task ReceiveStartGame(int lobbyId)
@@ -72,6 +72,12 @@ public class GameHub : Hub
     {
         _logger.LogDebug("Player {PlayerId} played card {CardIndex}", playerId, cardIndex);
         _lobbyService.GetLobby(lobbyId).Play(playerId, cardIndex);
+
+        if (_lobbyService.GetLobby(lobbyId).HandleWinner())
+        {
+            SendRoundWinnerAsync(lobbyId);
+        }
+
         await SendGameUpdateAsync(lobbyId);
     }
 
@@ -91,10 +97,10 @@ public class GameHub : Hub
             _lobbyService.GetLobby(lobbyId).GetConnectedUsernames());
     }
 
-    private async Task SendSelectedGameAsync(int lobbyId, GameEnum game)
+    private async Task SendSelectedGameAsync(int lobbyId, string gameName, string description)
     {
-        _logger.LogInformation("Lobby {LobbyId} selected {Game}", lobbyId, game);
-        await Clients.Group(lobbyId.ToString()).SendAsync("SelectedGameUpdate", game);
+        _logger.LogInformation("Lobby {LobbyId} selected {Game}", lobbyId, gameName);
+        await Clients.Group(lobbyId.ToString()).SendAsync("SelectedGameUpdate", gameName, description);
     }
 
     private async Task SendGameUpdateAsync(int lobbyId)
@@ -113,6 +119,14 @@ public class GameHub : Hub
                 await Clients.Client(connectionId).SendAsync("GameUpdate", gameData[i]);
             }
         }
+    }
+
+    private async Task SendRoundWinnerAsync(int lobbyId)
+    {
+        _logger.LogInformation("Lobby {LobbyId} has finished one round", lobbyId);
+
+        await Clients.Group(lobbyId.ToString())
+            .SendAsync("RoundWinner", _lobbyService.GetLobby(lobbyId).GetLeaderboard());
     }
 
     #endregion

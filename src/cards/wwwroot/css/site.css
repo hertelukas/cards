@@ -1,0 +1,27 @@
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+@font-face {
+    font-family: "Suits";
+    src: url("../fonts/suits.ttf");
+}
+
+.game-card {
+    margin: 5px;
+}
