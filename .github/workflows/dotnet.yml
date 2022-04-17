@@ -24,7 +24,7 @@ jobs:
     - name: Publish
       run: dotnet publish --configuration Release
     - name: Compress
-      run: tar -czf release.tar.gz -C /home/runner/work/cards/cards/cards/bin/Release/net6.0/publish .
+      run: tar -czf release.tar.gz -C /home/runner/work/cards/cards/src/cards/bin/Release/net6.0/publish .
     - name: Release
       uses: softprops/action-gh-release@v1
       if: startsWith(github.ref, 'refs/tags/')
