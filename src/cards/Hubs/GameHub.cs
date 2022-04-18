@@ -75,7 +75,7 @@ public class GameHub : Hub
 
         if (_lobbyService.GetLobby(lobbyId).HandleWinner())
         {
-            SendRoundWinnerAsync(lobbyId);
+            await SendRoundWinnerAsync(lobbyId);
         }
 
         await SendGameUpdateAsync(lobbyId);

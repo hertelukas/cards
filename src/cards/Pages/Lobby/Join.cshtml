@@ -8,7 +8,8 @@
 
 @if (TempData["ErrorMessage"] != null)
 {
-    <partial name="Shared/_NotificationMessage" model='@(JsonConvert.DeserializeObject<NotificationMessageModel>(TempData["ErrorMessage"].ToString()))'/>
+    <partial name="Shared/_NotificationMessage"
+             model='@(JsonConvert.DeserializeObject<NotificationMessageModel>(TempData["ErrorMessage"]?.ToString() ?? string.Empty))'/>
 }
 
 <form asp-page="Lobby/Join">
