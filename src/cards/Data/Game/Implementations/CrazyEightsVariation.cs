@@ -77,7 +77,7 @@ public class CrazyEightsVariation : CrazyEights
         }
     }
 
-    public override void NextPlayer()
+    protected override void NextPlayer()
     {
         // If he played, this is wrong
         if (HasTakenCard)

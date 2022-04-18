@@ -94,12 +94,7 @@ public class CrazyEights : IGameService
         return -1;
     }
 
-    public int GetCurrentPlayer()
-    {
-        return CurrentPlayer;
-    }
-
-    public ICard TakeCard()
+    protected ICard TakeCard()
     {
         var result = _deck.Dequeue();
 
@@ -162,16 +157,7 @@ public class CrazyEights : IGameService
         return PlayerCards[id];
     }
 
-    public ICollection<ICard> GetPlayableCards(int id)
-    {
-        var hand = GetHand(id);
-
-        return hand
-            .Where(IsPlayable)
-            .ToList();
-    }
-
-    public bool IsPlayable(ICard card)
+    private bool IsPlayable(ICard card)
     {
         var topCard = (Poker) GetLastPlayedCard();
         var playedCard = (Poker) card;
@@ -188,7 +174,7 @@ public class CrazyEights : IGameService
                playedCard.ValueProp == Poker.Value.Eight;
     }
 
-    public ICollection<ICard> Shuffle()
+    private void Shuffle()
     {
         var rnd = new Random();
         var n = _deck.Count;
@@ -204,10 +190,9 @@ public class CrazyEights : IGameService
         }
 
         _deck = new Queue<ICard>(deckAsList);
-        return _deck.ToList();
     }
 
-    public ICard GetLastPlayedCard()
+    private ICard GetLastPlayedCard()
     {
         return _playedCards.Peek();
     }
@@ -261,7 +246,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    public IEnumerable<IGameFeature> GetExtraOptions()
+    private IEnumerable<IGameFeature> GetExtraOptions()
     {
         var result = new List<IGameFeature>
         {
@@ -276,7 +261,7 @@ public class CrazyEights : IGameService
         return result;
     }
 
-    public virtual void NextPlayer()
+    protected virtual void NextPlayer()
     {
         CurrentPlayer = (CurrentPlayer + 1) % PlayerCards.Length;
         HasPlayedEight = false;
