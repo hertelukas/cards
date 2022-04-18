@@ -34,10 +34,7 @@ builder.Services.AddSignalR();
 builder.Services.AddSingleton<ILobbyService, EasyLobbyService>();
 
 // Configure URLs
-builder.Services.Configure<RouteOptions>(options =>
-{
-    options.LowercaseUrls = true;
-});
+builder.Services.Configure<RouteOptions>(options => { options.LowercaseUrls = true; });
 
 // Enable Email sender
 builder.Services.AddTransient<IEmailSender, EmailSender>(_ =>
@@ -66,9 +63,12 @@ else
     });
 
     app.UseExceptionHandler("/Error");
+    app.UseStatusCodePagesWithReExecute("/error", "?statusCode={0}");
+
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 
 app.UseStaticFiles();
 
