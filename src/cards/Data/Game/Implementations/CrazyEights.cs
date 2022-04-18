@@ -5,6 +5,9 @@ namespace cards.Data.Game.Implementations;
 public class CrazyEights : IGameService
 {
     private readonly ILogger<CrazyEights> _logger;
+
+    public Action<List<ICard>> ShuffleService { get; set; }
+
     protected List<ICard>[] PlayerCards;
     private Queue<ICard> _deck;
     private Stack<ICard> _playedCards;
@@ -19,6 +22,8 @@ public class CrazyEights : IGameService
         PlayerCards = Array.Empty<List<ICard>>();
         _deck = new Queue<ICard>();
         _playedCards = new Stack<ICard>();
+
+        ShuffleService = ShufflingStrategies.FisherYatesShuffle;
     }
 
     public static string GetTitle()
@@ -94,12 +99,7 @@ public class CrazyEights : IGameService
         return -1;
     }
 
-    public int GetCurrentPlayer()
-    {
-        return CurrentPlayer;
-    }
-
-    public ICard TakeCard()
+    protected ICard TakeCard()
     {
         var result = _deck.Dequeue();
 
@@ -162,16 +162,7 @@ public class CrazyEights : IGameService
         return PlayerCards[id];
     }
 
-    public ICollection<ICard> GetPlayableCards(int id)
-    {
-        var hand = GetHand(id);
-
-        return hand
-            .Where(IsPlayable)
-            .ToList();
-    }
-
-    public bool IsPlayable(ICard card)
+    private bool IsPlayable(ICard card)
     {
         var topCard = (Poker) GetLastPlayedCard();
         var playedCard = (Poker) card;
@@ -188,26 +179,16 @@ public class CrazyEights : IGameService
                playedCard.ValueProp == Poker.Value.Eight;
     }
 
-    public ICollection<ICard> Shuffle()
+    private void Shuffle()
     {
-        var rnd = new Random();
-        var n = _deck.Count;
-
-        _logger.LogInformation("Shuffling {Amount} cards", n);
-
         var deckAsList = _deck.ToList();
-        while (n > 1)
-        {
-            n--;
-            var k = rnd.Next(n + 1);
-            (deckAsList[k], deckAsList[n]) = (deckAsList[n], deckAsList[k]);
-        }
+
+        ShuffleService.Invoke(deckAsList);
 
         _deck = new Queue<ICard>(deckAsList);
-        return _deck.ToList();
     }
 
-    public ICard GetLastPlayedCard()
+    private ICard GetLastPlayedCard()
     {
         return _playedCards.Peek();
     }
@@ -261,7 +242,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    public IEnumerable<IGameFeature> GetExtraOptions()
+    private IEnumerable<IGameFeature> GetExtraOptions()
     {
         var result = new List<IGameFeature>
         {
@@ -276,7 +257,7 @@ public class CrazyEights : IGameService
         return result;
     }
 
-    public virtual void NextPlayer()
+    protected virtual void NextPlayer()
     {
         CurrentPlayer = (CurrentPlayer + 1) % PlayerCards.Length;
         HasPlayedEight = false;

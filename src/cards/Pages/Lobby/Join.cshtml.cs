@@ -1,11 +1,11 @@
+#nullable disable
+
 using System.ComponentModel.DataAnnotations;
 using cards.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
-
-#nullable disable
 
 namespace cards.Pages.Lobby;
 

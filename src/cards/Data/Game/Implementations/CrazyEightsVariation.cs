@@ -9,12 +9,12 @@ public class CrazyEightsVariation : CrazyEights
     private bool _wrongDirection;
     private int _stackedTwos;
 
-    public static string GetTitle()
+    public new static string GetTitle()
     {
         return "Crazy Eights Variation";
     }
 
-    public static string GetDescription()
+    public new static string GetDescription()
     {
         return
             "Crazy Eights with extra rules:<br>" +
@@ -77,7 +77,7 @@ public class CrazyEightsVariation : CrazyEights
         }
     }
 
-    public override void NextPlayer()
+    protected override void NextPlayer()
     {
         // If he played, this is wrong
         if (HasTakenCard)
