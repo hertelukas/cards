@@ -21,6 +21,8 @@ public class CrazyEightsVariation : CrazyEights
             "<b>Queens skip:</b> Playing a Queen causes the next player to miss their turn.<br>" +
             "<b>Aces reverse direction:</b> Playing an Ace reverses the direction of play.<br>" +
             "<b>Draw 2:</b> Playing a two forces the next player to draw two cards, unless they can play another two. Multiple twos \"stack\"; if a two is played in response to a two, the next player must draw four.<br>" +
+            "<b>Points:</b> The game ends as soon as one player has emptied their hand. That player collects a payment from each opponent equal to the point score of the cards remaining in that opponent's hand. " +
+            "8s score 50, court cards 10 and all other cards face value.<br>" +
             "<i>Source: Wikipedia</i>";
     }
 

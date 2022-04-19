@@ -40,6 +40,8 @@ public class CrazyEights : IGameService
             "They can also <b>play any 8 at any time, which allows them to declare the suit that the next player is to play;</b> that player must then follow the named suit or play another 8. " +
             "If a player is unable to play, that player draws cards from the stock pile. He can still play a card or skip his turn. " +
             "A player may draw from the stock pile at any time, even when holding one or more playable cards.<br>" +
+            "<b>Points:</b> The game ends as soon as one player has emptied their hand. That player collects a payment from each opponent equal to the point score of the cards remaining in that opponent's hand. " +
+            "8s score 50, court cards 10 and all other cards face value.<br>" +
             "<i>Source: Wikipedia</i>";
     }
 
