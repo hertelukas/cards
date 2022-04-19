@@ -10,6 +10,7 @@ public interface IGameService
         {
             GameEnum.CrazyEights => CrazyEights.GetTitle(),
             GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetTitle(),
+            GameEnum.President => President.GetTitle(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }
@@ -20,6 +21,7 @@ public interface IGameService
         {
             GameEnum.CrazyEights => CrazyEights.GetDescription(),
             GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetDescription(),
+            GameEnum.President => President.GetDescription(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }

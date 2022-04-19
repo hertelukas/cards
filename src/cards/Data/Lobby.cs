@@ -108,17 +108,13 @@ public class Lobby
 
         _logger.LogInformation("Game started");
 
-        switch (SelectedGame)
+        _game = SelectedGame switch
         {
-            case GameEnum.CrazyEights:
-                _game = new CrazyEights();
-                break;
-            case GameEnum.CrazyEightsVariation:
-                _game = new CrazyEightsVariation();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null);
-        }
+            GameEnum.CrazyEights => new CrazyEights(),
+            GameEnum.CrazyEightsVariation => new CrazyEightsVariation(),
+            GameEnum.President => new President(),
+            _ => throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null)
+        };
 
         // Remove all unconnected players
         foreach (var player in _players.Where(player => player.ConnectionId == null))
@@ -203,7 +199,7 @@ public class Lobby
         public Leaderboard(IEnumerable<Player> players, bool pointsGood)
         {
             Players = new List<SimplePlayer>();
-            
+
             foreach (var player in players)
             {
                 Players.Add(new SimplePlayer(player.Username, player.Points));

@@ -41,3 +41,13 @@ Cards is expecting following config variables, which can be set by environment v
 ### Get it up and running
 
 You can restore all necessary packages with `dotnet restore` and run the application with `dotnet run`.
+
+## Add a new game
+
+1. Create a new game in `Data/Game/Implementations`
+2. Your game has to implement the `IGameService`
+3. Add your game to the `Data/Game/GameEnum.cs` enum
+4. Add your game in `Data/Lobby.cs` to the switch statement in `StartGame()`
+5. Add a static title and description function to your game and add these to `Data/Game/IGameService.cs` static methods
+
+Looking at existing games might help, there are already algorithms for shuffling, card implementations etc.
