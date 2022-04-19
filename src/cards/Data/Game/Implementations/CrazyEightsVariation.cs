@@ -103,4 +103,19 @@ public class CrazyEightsVariation : CrazyEights
             base.NextPlayer();
         }
     }
+
+    public override List<GameData> GetGameData()
+    {
+        var result = base.GetGameData();
+
+        if (_stackedTwos > 0)
+        {
+            for (var i = 0; i < PlayerCards.Length; i++)
+            {
+                result[i].TopCard += $" (take {_stackedTwos} cards)";
+            }
+        }
+
+        return result;
+    }
 }

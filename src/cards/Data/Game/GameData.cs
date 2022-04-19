@@ -18,7 +18,7 @@ public class GameData
     public IEnumerable<int> OtherAmount { get; }
     public IEnumerable<string> OtherUsernames { get; set; }
     public int CurrentPlayer { get; }
-    public string? TopCard { get; }
+    public string? TopCard { get; set; }
     public IEnumerable<string?> Features { get; }
     public IEnumerable<bool> FeatureEnabled { get; }
     public int Id { get; set; }

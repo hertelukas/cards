@@ -270,7 +270,7 @@ public class CrazyEights : IGameService
         GetExtraOptions().ToList()[featureId].Execute(id);
     }
 
-    public List<GameData> GetGameData()
+    public virtual List<GameData> GetGameData()
     {
         var result = new List<GameData>();
 
