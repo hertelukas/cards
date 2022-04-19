@@ -64,7 +64,7 @@ public class GameHub : Hub
     public async Task ReceiveStartGame(int lobbyId)
     {
         _logger.LogInformation("Lobby {LobbyId} started a game", lobbyId);
-        _lobbyService.GetLobby(lobbyId).StartGame();
+        _lobbyService.GetLobby(lobbyId).StartGame(new DummyInformation());
         await SendGameUpdateAsync(lobbyId);
     }
 

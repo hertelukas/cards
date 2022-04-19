@@ -100,7 +100,7 @@ public class Lobby
         SelectedGame = game;
     }
 
-    public void StartGame(bool force = false)
+    public void StartGame(IPersistentInformation information, bool force = false)
     {
         // If game started, nothing will happen
         if (HasStarted && !force) return;
@@ -112,7 +112,7 @@ public class Lobby
         {
             GameEnum.CrazyEights => new CrazyEights(),
             GameEnum.CrazyEightsVariation => new CrazyEightsVariation(),
-            GameEnum.President => new President(),
+            GameEnum.President => new President(information),
             _ => throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null)
         };
 
@@ -154,7 +154,7 @@ public class Lobby
 
     public bool HandleWinner()
     {
-        if (_game.GetWinner() < 0)
+        if (!_game.IsOver())
             return false;
 
 
@@ -164,7 +164,7 @@ public class Lobby
             _players[i].Points += points[i];
         }
 
-        StartGame(true);
+        StartGame(_game.GetPersistentInformation(), true);
 
         return true;
     }
