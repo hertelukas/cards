@@ -162,9 +162,9 @@ public class CrazyEights : IGameService
         return PlayerCards[id];
     }
 
-    private bool IsPlayable(ICard card)
+    protected virtual bool IsPlayable(ICard card)
     {
-        var topCard = (Poker) GetLastPlayedCard();
+        var topCard = GetLastPlayedCard();
         var playedCard = (Poker) card;
 
         _logger.LogDebug("Trying to play {PlayedCard} on top of {TopCard}", playedCard.ToString(), topCard.ToString());
@@ -188,9 +188,9 @@ public class CrazyEights : IGameService
         _deck = new Queue<ICard>(deckAsList);
     }
 
-    private ICard GetLastPlayedCard()
+    private Poker GetLastPlayedCard()
     {
-        return _playedCards.Peek();
+        return (Poker) _playedCards.Peek();
     }
 
     // Checks if the card can be played and if the user owns the card
@@ -242,7 +242,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    private IEnumerable<IGameFeature> GetExtraOptions()
+    protected virtual IEnumerable<IGameFeature> GetExtraOptions()
     {
         var result = new List<IGameFeature>
         {
@@ -286,7 +286,7 @@ public class CrazyEights : IGameService
 
             var topCard = GetLastPlayedCard().ToHtmlString();
 
-            if (((Poker) GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
+            if (GetLastPlayedCard().ValueProp == Poker.Value.Eight)
             {
                 topCard += $": {Poker.SpanFromSuit(_wishedColor)}";
             }
