@@ -10,6 +10,7 @@ public interface IGameService
         {
             GameEnum.CrazyEights => CrazyEights.GetTitle(),
             GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetTitle(),
+            GameEnum.President => President.GetTitle(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }
@@ -20,6 +21,7 @@ public interface IGameService
         {
             GameEnum.CrazyEights => CrazyEights.GetDescription(),
             GameEnum.CrazyEightsVariation => CrazyEightsVariation.GetDescription(),
+            GameEnum.President => President.GetDescription(),
             _ => throw new ArgumentOutOfRangeException(nameof(gameEnum), gameEnum, null)
         };
     }
@@ -31,16 +33,25 @@ public interface IGameService
     public void Initialize(int players);
 
     /// <summary>
-    /// Get the winner of the current game
+    /// Determine the state of the game
     /// </summary>
-    /// <returns>The id of the winner, -1 if no winner exists</returns>
-    public int GetWinner();
+    /// <returns>Whether the game is over</returns>
+    public bool IsOver();
 
     /// <summary>
     /// Calculate points
     /// </summary>
     /// <returns>The points for this round for every user</returns>
     public List<int> CalcPoints();
+
+    /// <summary>
+    /// Gets passed to a next rounds game constructor
+    /// </summary>
+    /// <returns>Data that is needed in the next round</returns>
+    public virtual IPersistentInformation GetPersistentInformation()
+    {
+        return new DummyInformation();
+    }
 
     /// <summary>
     /// Meaning of points

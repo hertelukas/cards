@@ -86,7 +86,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    public int GetWinner()
+    private int GetWinner()
     {
         for (var i = 0; i < PlayerCards.Length; i++)
         {
@@ -99,6 +99,11 @@ public class CrazyEights : IGameService
 
         _logger.LogInformation("No winner determined");
         return -1;
+    }
+
+    public bool IsOver()
+    {
+        return GetWinner() >= 0;
     }
 
     protected ICard TakeCard()

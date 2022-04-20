@@ -100,7 +100,7 @@ public class Lobby
         SelectedGame = game;
     }
 
-    public void StartGame(bool force = false)
+    public void StartGame(IPersistentInformation information, bool force = false)
     {
         // If game started, nothing will happen
         if (HasStarted && !force) return;
@@ -108,17 +108,13 @@ public class Lobby
 
         _logger.LogInformation("Game started");
 
-        switch (SelectedGame)
+        _game = SelectedGame switch
         {
-            case GameEnum.CrazyEights:
-                _game = new CrazyEights();
-                break;
-            case GameEnum.CrazyEightsVariation:
-                _game = new CrazyEightsVariation();
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null);
-        }
+            GameEnum.CrazyEights => new CrazyEights(),
+            GameEnum.CrazyEightsVariation => new CrazyEightsVariation(),
+            GameEnum.President => new President(information),
+            _ => throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null)
+        };
 
         // Remove all unconnected players
         foreach (var player in _players.Where(player => player.ConnectionId == null))
@@ -158,7 +154,7 @@ public class Lobby
 
     public bool HandleWinner()
     {
-        if (_game.GetWinner() < 0)
+        if (!_game.IsOver())
             return false;
 
 
@@ -168,7 +164,7 @@ public class Lobby
             _players[i].Points += points[i];
         }
 
-        StartGame(true);
+        StartGame(_game.GetPersistentInformation(), true);
 
         return true;
     }
@@ -203,7 +199,7 @@ public class Lobby
         public Leaderboard(IEnumerable<Player> players, bool pointsGood)
         {
             Players = new List<SimplePlayer>();
-            
+
             foreach (var player in players)
             {
                 Players.Add(new SimplePlayer(player.Username, player.Points));

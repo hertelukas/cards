@@ -1,6 +1,6 @@
 namespace cards.Data.Game.Decks;
 
-public class Poker : ICard
+public class Poker : ICard, IComparable
 {
     public Poker(Value value, Suit suit)
     {
@@ -21,6 +21,19 @@ public class Poker : ICard
         return $"{SuitProp} {ValueProp}";
     }
 
+    public int CompareTo(object? obj)
+    {
+        if (obj == null || obj.GetType() != typeof(Poker))
+        {
+            return 1;
+        }
+
+        var other = (Poker) obj;
+
+        var valCompare = ValueProp.CompareTo(other.ValueProp);
+        return valCompare == 0 ? SuitProp.CompareTo(other.SuitProp) : valCompare;
+    }
+
     public static string SpanFromSuit(Suit suit)
     {
         if (suit is Suit.Hearts or Suit.Tiles)
@@ -31,11 +44,26 @@ public class Poker : ICard
         return $"<span style=\"font-family:Suits;\">&#{0xe900 + suit}</span>";
     }
 
+    public static Queue<Poker> GetDeck()
+    {
+        var result = new Queue<Poker>();
+
+        foreach (var value in Enum.GetValues<Value>())
+        {
+            foreach (var suit in Enum.GetValues<Suit>())
+            {
+                result.Enqueue(new Poker(value, suit));
+            }
+        }
+
+        return result;
+    }
+
     public enum Suit
     {
         Clovers,
-        Hearts,
         Pikes,
+        Hearts,
         Tiles
     }
 
