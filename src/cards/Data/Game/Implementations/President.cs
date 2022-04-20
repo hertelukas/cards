@@ -56,8 +56,24 @@ public class President : IGameService
 
     public static string GetDescription()
     {
-        //TODO
-        return "TODO";
+        return
+            "<b>Dealing: </b>  All the cards are dealt as evenly as possible in clockwise rotation. " +
+            "After cards are dealt, the scum must hand over the best card in their hand to the president, " +
+            "and the president passes back any card they do not want. When playing with four or more players, " +
+            "the president exchanges two cards with the scum and the vice president one with the high scum. <br>" +
+            "<b>Playing: </b> Play in President is organized into tricks, much like in spades or bridge. " +
+            "However, unlike those games, each trick can involve more than one card played by each player, " +
+            "and players do not have to play a card in a trick. Suits are irrelevant in the game of president. <br>" +
+            "The player on the dealer's left begins by leading any number of cards of the same rank. " +
+            "The player on the left may then play an equal number of matching cards with a higher face value, or may pass. " +
+            "Note that the same number of cards as the lead must be played. If the leader starts with a pair, only pairs may be played on top of it. " +
+            "If three-of-a-kind is led, only three-of-a-kinds can be played on top of it. " +
+            "The next player may do the same, and so on. <br>" +
+            "This continues until all players have had a turn (which may or may not be because the highest-value card has already been played), or opted to pass. <br>" +
+            "<b>End of a round: </b> When one player runs out of cards, they are out of play for the rest of the round, " +
+            "but the other players can continue to play to figure out the titles. <br>" +
+            "This version does not rearrange the seating of the players, so everyone plays in the same order each hand (though the scum leads the first trick).<br>" +
+            "<i>Source: Wikipedia</i>";
     }
 
     private void LoadPersistentInformation(PersistentInformation information)
