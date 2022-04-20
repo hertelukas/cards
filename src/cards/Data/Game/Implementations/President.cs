@@ -90,7 +90,15 @@ public class President : IGameService
 
     public List<int> CalcPoints()
     {
-        throw new NotImplementedException();
+        var result = new int[_playerCards.Length];
+
+        var points = _playerCards.Length;
+        foreach (var playerIndex in _finishedPlayers)
+        {
+            result[playerIndex] = points--;
+        }
+
+        return new List<int>(result);
     }
 
     public IPersistentInformation GetPersistentInformation()
@@ -177,11 +185,6 @@ public class President : IGameService
             {
                 _finishedPlayers.Add(i);
             }
-        }
-
-        if (IsOver())
-        {
-            return;
         }
 
         _currentlyPlayedCards = new List<Poker>();
@@ -305,12 +308,13 @@ public class President : IGameService
 
         public string GetName()
         {
-            return "Next player";
+            return "Confirm";
         }
 
         public bool IsExecutable(int player)
         {
-            return _game._currentPlayer == player && _game._playedCards.Count == 0;
+            return _game._currentPlayer == player && _game._playedCards.Count == 0 &&
+                   _game._currentlyPlayedCards.Count > 0;
         }
 
         public bool Execute(int player)
@@ -365,7 +369,7 @@ public class President : IGameService
 
         public string GetName()
         {
-            return "Sort cards";
+            return "Sort";
         }
 
         public bool IsExecutable(int player)
@@ -404,6 +408,8 @@ public class President : IGameService
         {
             if (!IsExecutable(player)) return false;
 
+            // Add played cards back to the player
+            _game._playerCards[player].AddRange(_game._currentlyPlayedCards);
             _game.NextPlayer();
 
             return true;
