@@ -21,12 +21,23 @@ public class CrazyEightsVariation : CrazyEights
             "<b>Queens skip:</b> Playing a Queen causes the next player to miss their turn.<br>" +
             "<b>Aces reverse direction:</b> Playing an Ace reverses the direction of play.<br>" +
             "<b>Draw 2:</b> Playing a two forces the next player to draw two cards, unless they can play another two. Multiple twos \"stack\"; if a two is played in response to a two, the next player must draw four.<br>" +
+            "<b>Points:</b> The game ends as soon as one player has emptied their hand. That player collects a payment from each opponent equal to the point score of the cards remaining in that opponent's hand. " +
+            "8s score 50, court cards 10 and all other cards face value.<br>" +
             "<i>Source: Wikipedia</i>";
     }
 
     public CrazyEightsVariation()
     {
         _logger = LoggerFactory.Create(c => c.AddConsole()).CreateLogger<CrazyEightsVariation>();
+    }
+
+    protected override bool IsPlayable(ICard card)
+    {
+        // If the player has to take twos and doesn't try to play a two, the move is invalid
+        if (_stackedTwos > 0 && ((Poker) card).ValueProp != Poker.Value.Two)
+            return false;
+
+        return base.IsPlayable(card);
     }
 
     public override void Play(int id, int cardIndex)
@@ -48,18 +59,6 @@ public class CrazyEightsVariation : CrazyEights
                 _logger.LogInformation("Stack increased by two: {StackedTwos}", _stackedTwos);
                 _stackedTwos += 2;
             }
-            else
-            {
-                while (_stackedTwos > 0)
-                {
-                    _logger.LogInformation(
-                        "Taking a card from the stack, " +
-                        "{CurrentPlayer} didn't play a two",
-                        CurrentPlayer);
-                    PlayerCards[CurrentPlayer].Add(TakeCard());
-                    _stackedTwos--;
-                }
-            }
         }
 
         base.Play(id, cardIndex);
@@ -77,9 +76,17 @@ public class CrazyEightsVariation : CrazyEights
         }
     }
 
+    protected override IEnumerable<IGameFeature> GetExtraOptions()
+    {
+        var result = base.GetExtraOptions().ToList();
+        result.Add(new TakePlusTwoCardsFeature(this));
+        return result;
+    }
+
     protected override void NextPlayer()
     {
-        // If he played, this is wrong
+        // If the player hasn't played, he has taken a card
+        // The player has to take all stacked twos
         if (HasTakenCard)
         {
             while (_stackedTwos > 0)
@@ -101,6 +108,55 @@ public class CrazyEightsVariation : CrazyEights
         else
         {
             base.NextPlayer();
+        }
+    }
+
+    public override List<GameData> GetGameData()
+    {
+        var result = base.GetGameData();
+
+        if (_stackedTwos > 0)
+        {
+            for (var i = 0; i < PlayerCards.Length; i++)
+            {
+                result[i].TopCard += $" (take {_stackedTwos} cards)";
+            }
+        }
+
+        return result;
+    }
+
+    private class TakePlusTwoCardsFeature : IGameFeature
+    {
+        private readonly CrazyEightsVariation _game;
+
+        public TakePlusTwoCardsFeature(CrazyEightsVariation game)
+        {
+            _game = game;
+        }
+
+        public string GetName()
+        {
+            return $"Take {_game._stackedTwos}";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return _game.CurrentPlayer == player && _game._stackedTwos > 0;
+        }
+
+        public bool Execute(int player)
+        {
+            // Abort if not executable
+            if (!IsExecutable(player)) return false;
+
+            while (_game._stackedTwos > 0)
+            {
+                _game.PlayerCards[player].Add(_game.TakeCard());
+                _game._stackedTwos--;
+            }
+
+            return true;
         }
     }
 }

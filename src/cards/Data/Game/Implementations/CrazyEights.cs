@@ -40,6 +40,8 @@ public class CrazyEights : IGameService
             "They can also <b>play any 8 at any time, which allows them to declare the suit that the next player is to play;</b> that player must then follow the named suit or play another 8. " +
             "If a player is unable to play, that player draws cards from the stock pile. He can still play a card or skip his turn. " +
             "A player may draw from the stock pile at any time, even when holding one or more playable cards.<br>" +
+            "<b>Points:</b> The game ends as soon as one player has emptied their hand. That player collects a payment from each opponent equal to the point score of the cards remaining in that opponent's hand. " +
+            "8s score 50, court cards 10 and all other cards face value.<br>" +
             "<i>Source: Wikipedia</i>";
     }
 
@@ -84,7 +86,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    public int GetWinner()
+    private int GetWinner()
     {
         for (var i = 0; i < PlayerCards.Length; i++)
         {
@@ -97,6 +99,11 @@ public class CrazyEights : IGameService
 
         _logger.LogInformation("No winner determined");
         return -1;
+    }
+
+    public bool IsOver()
+    {
+        return GetWinner() >= 0;
     }
 
     protected ICard TakeCard()
@@ -162,9 +169,9 @@ public class CrazyEights : IGameService
         return PlayerCards[id];
     }
 
-    private bool IsPlayable(ICard card)
+    protected virtual bool IsPlayable(ICard card)
     {
-        var topCard = (Poker) GetLastPlayedCard();
+        var topCard = GetLastPlayedCard();
         var playedCard = (Poker) card;
 
         _logger.LogDebug("Trying to play {PlayedCard} on top of {TopCard}", playedCard.ToString(), topCard.ToString());
@@ -188,9 +195,9 @@ public class CrazyEights : IGameService
         _deck = new Queue<ICard>(deckAsList);
     }
 
-    private ICard GetLastPlayedCard()
+    private Poker GetLastPlayedCard()
     {
-        return _playedCards.Peek();
+        return (Poker) _playedCards.Peek();
     }
 
     // Checks if the card can be played and if the user owns the card
@@ -242,7 +249,7 @@ public class CrazyEights : IGameService
         }
     }
 
-    private IEnumerable<IGameFeature> GetExtraOptions()
+    protected virtual IEnumerable<IGameFeature> GetExtraOptions()
     {
         var result = new List<IGameFeature>
         {
@@ -270,7 +277,7 @@ public class CrazyEights : IGameService
         GetExtraOptions().ToList()[featureId].Execute(id);
     }
 
-    public List<GameData> GetGameData()
+    public virtual List<GameData> GetGameData()
     {
         var result = new List<GameData>();
 
@@ -286,7 +293,7 @@ public class CrazyEights : IGameService
 
             var topCard = GetLastPlayedCard().ToHtmlString();
 
-            if (((Poker) GetLastPlayedCard()).ValueProp == Poker.Value.Eight)
+            if (GetLastPlayedCard().ValueProp == Poker.Value.Eight)
             {
                 topCard += $": {Poker.SpanFromSuit(_wishedColor)}";
             }
