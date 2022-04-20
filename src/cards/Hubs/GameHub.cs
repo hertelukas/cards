@@ -84,6 +84,12 @@ public class GameHub : Hub
     public async Task ReceiveFeature(int lobbyId, int playerId, int featureId)
     {
         _lobbyService.GetLobby(lobbyId).ExecuteFeature(playerId, featureId);
+
+        if (_lobbyService.GetLobby(lobbyId).HandleWinner())
+        {
+            await SendRoundWinnerAsync(lobbyId);
+        }
+
         await SendGameUpdateAsync(lobbyId);
     }
 

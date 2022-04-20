@@ -20,6 +20,13 @@ public class President : IGameService
     private int _highScumIndex = -1;
     private int _scumIndex = -1;
 
+    private List<Poker> _cardsForPresident;
+    private List<Poker> _cardsForVicePresident;
+    private List<Poker> _cardsForHighScum;
+    private List<Poker> _cardsForScum;
+
+    private bool _exchangesFinished = true;
+
     public President(IPersistentInformation gameInformation)
     {
         if (gameInformation.GetType() == typeof(PersistentInformation))
@@ -34,12 +41,17 @@ public class President : IGameService
         _currentlyPlayedCards = new List<Poker>();
         _finishedPlayers = new List<int>();
 
+        _cardsForPresident = new List<Poker>();
+        _cardsForScum = new List<Poker>();
+        _cardsForVicePresident = new List<Poker>();
+        _cardsForHighScum = new List<Poker>();
+
         ShuffleService = ShufflingStrategies.FisherYatesShuffle;
     }
 
     public static string GetTitle()
     {
-        return "President";
+        return "President (Beta)";
     }
 
     public static string GetDescription()
@@ -56,6 +68,38 @@ public class President : IGameService
         _scumIndex = information.ScumIndex;
         // Scum can start with the next round
         _currentPlayer = _scumIndex;
+        _exchangesFinished = false;
+    }
+
+    private void CheckExchangesFinished()
+    {
+        // If not all exchanges finished, return
+        if (_presidentIndex != -1)
+        {
+            if (_cardsForPresident.Count == 0 || _cardsForScum.Count == 0)
+            {
+                return;
+            }
+        }
+
+        if (_vicePresidentIndex != -1)
+        {
+            if (_cardsForVicePresident.Count != 1 || _cardsForHighScum.Count != 1 || _cardsForPresident.Count != 2 ||
+                _cardsForScum.Count != 2)
+            {
+                return;
+            }
+
+            // All exchanges satisfied, exchange cards
+            _playerCards[_vicePresidentIndex].AddRange(_cardsForVicePresident);
+            _playerCards[_highScumIndex].AddRange(_cardsForHighScum);
+        }
+
+        _playerCards[_presidentIndex].AddRange(_cardsForPresident);
+        _playerCards[_scumIndex].AddRange(_cardsForScum);
+
+
+        _exchangesFinished = true;
     }
 
     public void Initialize(int players)
@@ -85,7 +129,8 @@ public class President : IGameService
 
     public bool IsOver()
     {
-        return _finishedPlayers.Count == _playerCards.Length - 1;
+        Console.WriteLine($"Checking if over: {_finishedPlayers.Count} >= {_playerCards.Length - 1}");
+        return _finishedPlayers.Count >= _playerCards.Length - 1;
     }
 
     public List<int> CalcPoints()
@@ -158,6 +203,12 @@ public class President : IGameService
 
     private bool CanPlay(int playerId, int cardIndex)
     {
+        // If there are still exchanges happening, nothing can be played
+        if (!_exchangesFinished)
+        {
+            return false;
+        }
+
         // Check whether the player is playing
         if (_currentPlayer != playerId)
         {
@@ -185,6 +236,11 @@ public class President : IGameService
             {
                 _finishedPlayers.Add(i);
             }
+        }
+
+        if (IsOver())
+        {
+            return;
         }
 
         _currentlyPlayedCards = new List<Poker>();
@@ -233,26 +289,38 @@ public class President : IGameService
         {
             _playedCards.Push(_currentlyPlayedCards);
             _lastPlayerPlayed = id;
+
             NextPlayer();
         }
     }
 
-    private IEnumerable<IGameFeature> GetFeatures()
+    private IEnumerable<IGameFeature> GetFeatures(int playerIndex)
     {
         var result = new List<IGameFeature>
         {
             new PlayFirstCards(this),
             new Cancel(this),
             new Sort(this),
-            new Pass(this)
+            new Pass(this),
+            new ExchangeBestCard(this, playerIndex)
         };
+
+        // Add all give cards features
+        if (!_exchangesFinished)
+        {
+            for (var i = 0; i < _playerCards[playerIndex].Count; i++)
+            {
+                result.Add(new ExchangeAnyCard(this, playerIndex, i));
+            }
+        }
+
         return result;
     }
 
     public void ExecuteFeature(int id, int featureId)
     {
         _logger.LogDebug("Player {PlayerId} is trying to execute feature {FeatureIndex}", id, featureId);
-        GetFeatures().ToList()[featureId].Execute(id);
+        GetFeatures(id).ToList()[featureId].Execute(id);
     }
 
     public List<GameData> GetGameData()
@@ -281,8 +349,8 @@ public class President : IGameService
                     $"<h5> Played: {string.Join(", ", _currentlyPlayedCards.Select(card => card.ToHtmlString()))}</h5>";
             }
 
-            var features = GetFeatures().Select(feature => feature.GetName()).ToList();
-            var featuresEnabled = GetFeatures().Select(feature => feature.IsExecutable(i)).ToList();
+            var features = GetFeatures(i).Select(feature => feature.GetName()).ToList();
+            var featuresEnabled = GetFeatures(i).Select(feature => feature.IsExecutable(i)).ToList();
 
             result.Add(new GameData(
                 cards,
@@ -296,6 +364,8 @@ public class President : IGameService
 
         return result;
     }
+
+    #region Features
 
     private class PlayFirstCards : IGameFeature
     {
@@ -314,7 +384,7 @@ public class President : IGameService
         public bool IsExecutable(int player)
         {
             return _game._currentPlayer == player && _game._playedCards.Count == 0 &&
-                   _game._currentlyPlayedCards.Count > 0;
+                   _game._currentlyPlayedCards.Count > 0 && _game._exchangesFinished;
         }
 
         public bool Execute(int player)
@@ -401,7 +471,7 @@ public class President : IGameService
 
         public bool IsExecutable(int player)
         {
-            return _game._currentPlayer == player;
+            return _game._currentPlayer == player && _game._exchangesFinished;
         }
 
         public bool Execute(int player)
@@ -415,6 +485,134 @@ public class President : IGameService
             return true;
         }
     }
+
+    private class ExchangeBestCard : IGameFeature
+    {
+        private readonly President _game;
+        private readonly Poker? _bestCard;
+
+        public ExchangeBestCard(President game, int playerIndex)
+        {
+            _game = game;
+            _bestCard = _game._playerCards[playerIndex].Max();
+        }
+
+        public string GetName()
+        {
+            return _bestCard == null ? "" : $"Give {_bestCard.ToHtmlString()}";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            if (_game._exchangesFinished)
+            {
+                return false;
+            }
+
+            // Scum exchange
+            if (_game._scumIndex == player)
+            {
+                if (_game._cardsForPresident.Count < 1)
+                {
+                    return true;
+                }
+
+                // Exchange two cards
+                if (_game._highScumIndex != -1 && _game._cardsForPresident.Count < 2)
+                {
+                    return true;
+                }
+            }
+
+            // High scum exchange
+            if (_game._highScumIndex == player)
+            {
+                if (_game._cardsForVicePresident.Count < 1)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public bool Execute(int player)
+        {
+            if (!IsExecutable(player)) return false;
+
+            if (_game._scumIndex == player && _bestCard != null)
+            {
+                _game._cardsForPresident.Add(_bestCard);
+                _game._playerCards[player].Remove(_bestCard);
+            }
+
+            if (_game._highScumIndex == player && _bestCard != null)
+            {
+                _game._cardsForVicePresident.Add(_bestCard);
+                _game._playerCards[player].Remove(_bestCard);
+            }
+
+            _game.CheckExchangesFinished();
+
+            return true;
+        }
+    }
+
+    private class ExchangeAnyCard : IGameFeature
+    {
+        private readonly President _game;
+        private readonly bool _canExchange;
+        private readonly bool _isPresident;
+        private readonly Poker _card;
+
+        public ExchangeAnyCard(President game, int playerIndex, int cardIndex)
+        {
+            _game = game;
+
+            var presidentCanExchange = game._cardsForScum.Count < 2 &&
+                                       (game._cardsForScum.Count < 1 || game._vicePresidentIndex == -1);
+
+            var vicePresidentCanExchange = game._cardsForHighScum.Count < 1;
+
+            _isPresident = playerIndex == game._presidentIndex;
+
+            _canExchange = _isPresident && presidentCanExchange ||
+                           playerIndex == game._vicePresidentIndex && vicePresidentCanExchange;
+
+            _card = game._playerCards[playerIndex][cardIndex];
+        }
+
+        public string GetName()
+        {
+            return $"Give {_card.ToHtmlString()}";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return !_game._exchangesFinished && _canExchange;
+        }
+
+        public bool Execute(int player)
+        {
+            if (!IsExecutable(player)) return false;
+
+            if (_isPresident)
+            {
+                _game._cardsForScum.Add(_card);
+            }
+            else
+            {
+                _game._cardsForHighScum.Add(_card);
+            }
+
+            _game._playerCards[player].Remove(_card);
+
+            _game.CheckExchangesFinished();
+            return true;
+        }
+    }
+
+    #endregion
 
     private class PersistentInformation : IPersistentInformation
     {
