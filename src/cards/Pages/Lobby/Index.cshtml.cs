@@ -21,6 +21,7 @@ public class IndexModel : PageModel
     public int Id { get; set; }
     public Data.Lobby Lobby { get; private set; }
     public string Username { get; private set; }
+    public string JoinLink { get; private set; }
 
     [TempData] public string ErrorMessage { get; set; }
 
@@ -51,7 +52,9 @@ public class IndexModel : PageModel
             }
 
             Username = username;
+            JoinLink = Url.Page("Join", null, new {id}, Request.Scheme);
 
+            Console.WriteLine("Link: " + JoinLink);
             return Page();
         }
         catch (NullReferenceException)

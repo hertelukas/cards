@@ -34,6 +34,11 @@
         </div>
         <br>
         <button class="btn btn-primary" id="startGameButton" onclick="startGame()">Start Game</button>
+        <br>
+        <div class="input-group">
+            <input type="text" class="form-control" readonly value="@Model.JoinLink">
+            <button class="btn-primary btn" onclick="copy()" id="copyButton">Copy</button>
+        </div>
     </div>
 
     <div class="col-8">
@@ -264,4 +269,10 @@ function feature(playerId, featureId){
     });    
 }
 
+// Other functions
+const copyButton = document.getElementById("copyButton");
+function copy(){
+    navigator.clipboard.writeText("@Model.JoinLink");
+    copyButton.innerText = "Copied!";
+}
 </script>
