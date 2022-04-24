@@ -253,6 +253,8 @@ public class CrazyEights : IGameService
     {
         var result = new List<IGameFeature>
         {
+            new SortByValue(this),
+            new SortBySuit(this),
             new ChooseSuitFeature(this, Poker.Suit.Clovers),
             new ChooseSuitFeature(this, Poker.Suit.Hearts),
             new ChooseSuitFeature(this, Poker.Suit.Tiles),
@@ -312,6 +314,66 @@ public class CrazyEights : IGameService
         }
 
         return result;
+    }
+
+    private class SortByValue : IGameFeature
+    {
+        private readonly CrazyEights _game;
+
+        public SortByValue(CrazyEights game)
+        {
+            _game = game;
+        }
+
+        public string GetName()
+        {
+            return "Sort by value";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return true;
+        }
+
+        public bool Execute(int player)
+        {
+            _game.PlayerCards[player].Sort();
+            return true;
+        }
+    }
+
+    private class SortBySuit : IGameFeature
+    {
+        private readonly CrazyEights _game;
+
+        public SortBySuit(CrazyEights game)
+        {
+            _game = game;
+        }
+
+        public string GetName()
+        {
+            return "Sort by suit";
+        }
+
+        public bool IsExecutable(int player)
+        {
+            return true;
+        }
+
+        public bool Execute(int player)
+        {
+            _game.PlayerCards[player].Sort((c1, c2) =>
+            {
+                var p1 = (Poker) c1;
+                var p2 = (Poker) c2;
+
+                var suitCompare = p1.SuitProp.CompareTo(p2.SuitProp);
+                return suitCompare == 0 ? p1.ValueProp.CompareTo(p2.ValueProp) : suitCompare;
+            });
+
+            return true;
+        }
     }
 
     private class TakeCardFeature : IGameFeature
