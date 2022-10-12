@@ -61,6 +61,20 @@
         <div>
             <ul id="userList"></ul>
         </div>
+        <div>
+            <h5 id="gameTitleSidebar">
+                @if (Model.Lobby.HasSelected)
+                {
+                    @Html.Raw(IGameService.GetTitle(Model.Lobby.SelectedGame))
+                }
+            </h5>
+            <p id="gameDescriptionSidebar">
+                @if (Model.Lobby.HasSelected)
+                {
+                    @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
+                }
+            </p>
+        </div>
     </div>
 </div>
 
@@ -126,10 +140,15 @@ connection.on("ConnectedUsersUpdate", function (users) {
 
 const selectDropdownButton = document.getElementById("selectGameDropdownButton");
 const descriptionParagraph = document.getElementById("gameDescription");
+const descriptionParagraphSidebar = document.getElementById("gameDescriptionSidebar");
+const gameTitleSidebar = document.getElementById("gameTitleSidebar");
+
 connection.on("SelectedGameUpdate", function(game, description) {
     selectDropdownButton.innerHTML = `<span>${game} </span>`;
     descriptionParagraph.innerHTML = description;
     descriptionParagraph.hidden = false;
+    descriptionParagraphSidebar.innerHTML = description;
+    gameTitleSidebar.innerHTML = game;
 });
 
 const dropdown = document.getElementById("gameDropdown");
