@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using cards.Data.Game;
-using cards.Data.Game.Implementations;
+using cards.Data.Game.Implementations.CrazyEights;
+using cards.Data.Game.Implementations.President;
+using Microsoft.VisualBasic;
 
 namespace cards.Data;
 
@@ -9,8 +11,9 @@ public class Lobby
     private readonly ILogger<Lobby> _logger;
 
     private readonly string _password;
-    private IGameService _game;
     private readonly List<Player> _players;
+
+    public Game.Game? Game;
     public bool HasStarted { get; private set; }
     public GameEnum SelectedGame { get; private set; }
     public bool HasSelected { get; private set; }
@@ -98,9 +101,17 @@ public class Lobby
 
         HasSelected = true;
         SelectedGame = game;
+
+        Game = SelectedGame switch
+        {
+            GameEnum.CrazyEights => new CrazyEights(),
+            GameEnum.CrazyEightsVariation => new CrazyEightsVariation(),
+            GameEnum.President => new President(new DummyInformation()),
+            _ => throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null)
+        };
     }
 
-    public void StartGame(IPersistentInformation information, bool force = false)
+    public void StartGame(bool force = false)
     {
         // If game started, nothing will happen
         if (HasStarted && !force) return;
@@ -108,13 +119,7 @@ public class Lobby
 
         _logger.LogInformation("Game started");
 
-        _game = SelectedGame switch
-        {
-            GameEnum.CrazyEights => new CrazyEights(),
-            GameEnum.CrazyEightsVariation => new CrazyEightsVariation(),
-            GameEnum.President => new President(information),
-            _ => throw new ArgumentOutOfRangeException(nameof(SelectedGame), SelectedGame, null)
-        };
+        Game.GetPersistentInformation();
 
         // Remove all unconnected players
         foreach (var player in _players.Where(player => player.ConnectionId == null))
@@ -124,12 +129,12 @@ public class Lobby
                 player.Username);
         }
 
-        _game.Initialize(_players.Count);
+        Game.Initialize(_players.Count);
     }
 
     public List<GameData> GetGameData()
     {
-        var result = _game.GetGameData();
+        var result = Game.GetGameData();
         // Fill in usernames
         var connectedUsernames = GetConnectedUsernames();
         for (var i = 0; i < result.Count; i++)
@@ -149,34 +154,34 @@ public class Lobby
 
     public void Play(int playerId, int cardIndex)
     {
-        _game.Play(playerId, cardIndex);
+        Game.Play(playerId, cardIndex);
     }
 
     public bool HandleWinner()
     {
-        if (!_game.IsOver())
+        if (!Game.IsOver())
             return false;
 
 
-        var points = _game.CalcPoints();
+        var points = Game.CalcPoints();
         for (var i = 0; i < points.Count; i++)
         {
             _players[i].Points += points[i];
         }
 
-        StartGame(_game.GetPersistentInformation(), true);
+        StartGame(force: true);
 
         return true;
     }
 
     public Leaderboard GetLeaderboard()
     {
-        return new Leaderboard(_players, _game.PointsAreGood());
+        return new Leaderboard(_players, Game.PointsAreGood);
     }
 
     public void ExecuteFeature(int playerId, int featureId)
     {
-        _game.ExecuteFeature(playerId, featureId);
+        Game.ExecuteFeature(playerId, featureId);
     }
 
     public class Leaderboard

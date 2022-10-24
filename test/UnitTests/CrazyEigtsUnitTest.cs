@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using cards.Data.Enums.Card;
 using cards.Data.Game.Decks;
 using cards.Data.Game.Implementations;
+using cards.Data.Game.Implementations.CrazyEights;
 using Xunit;
 
 namespace UnitTests;
@@ -51,26 +53,26 @@ public class CrazyEightsUnitTest
         {
             new object[]
             {
-                new Poker(Poker.Value.Ace, Poker.Suit.Hearts),
-                new Poker(Poker.Value.Seven, Poker.Suit.Clovers),
+                new Poker(Value.Ace, Suit.Hearts),
+                new Poker(Value.Seven, Suit.Clovers),
                 false
             },
             new object[]
             {
-                new Poker(Poker.Value.Ace, Poker.Suit.Hearts),
-                new Poker(Poker.Value.Ace, Poker.Suit.Clovers),
+                new Poker(Value.Ace, Suit.Hearts),
+                new Poker(Value.Ace, Suit.Clovers),
                 true
             },
             new object[]
             {
-                new Poker(Poker.Value.Ace, Poker.Suit.Clovers),
-                new Poker(Poker.Value.Eight, Poker.Suit.Hearts),
+                new Poker(Value.Ace, Suit.Clovers),
+                new Poker(Value.Eight, Suit.Hearts),
                 true
             },
             new object[]
             {
-                new Poker(Poker.Value.Five, Poker.Suit.Pikes),
-                new Poker(Poker.Value.Six, Poker.Suit.Clovers),
+                new Poker(Value.Five, Suit.Peaks),
+                new Poker(Value.Six, Suit.Clovers),
                 false
             }
         };

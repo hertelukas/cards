@@ -15,7 +15,7 @@
                 @if (Model.Lobby.HasSelected)
                 {
                     <span>
-                        @(IGameService.GetTitle(Model.Lobby.SelectedGame))
+                        @(Model.Lobby.Game?.Title)
                     </span>
                 }
                 else
@@ -27,7 +27,7 @@
                 @foreach (var game in Enum.GetValues<GameEnum>())
                 {
                     <li>
-                        <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">@(IGameService.GetTitle(game))</button>
+                        <button class="dropdown-item" id="select-@game" onclick="setGame(@((int) game))">Model.Lobby.Game?.Title)</button>
                     </li>
                 }
             </ul>
@@ -45,7 +45,7 @@
         <p id="gameDescription">
             @if (Model.Lobby.HasSelected)
             {
-                @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
+                @Html.Raw(Model.Lobby.Game?.Description)
             }
         </p>
     </div>
@@ -65,13 +65,13 @@
             <h5 id="gameTitleSidebar">
                 @if (Model.Lobby.HasSelected)
                 {
-                    @Html.Raw(IGameService.GetTitle(Model.Lobby.SelectedGame))
+                    @Html.Raw(Model.Lobby.Game?.Title)
                 }
             </h5>
             <p id="gameDescriptionSidebar">
                 @if (Model.Lobby.HasSelected)
                 {
-                    @Html.Raw(IGameService.GetDescription(Model.Lobby.SelectedGame))
+                    @Html.Raw(Model.Lobby.Game?.Description)
                 }
             </p>
         </div>

@@ -1,24 +1,27 @@
+using cards.Data.Enums.Card;
+
 namespace cards.Data.Game.Decks;
 
 public class Poker : ICard, IComparable
 {
     public Poker(Value value, Suit suit)
     {
-        ValueProp = value;
-        SuitProp = suit;
+        Value = value;
+        Suit = suit;
     }
 
-    public Suit SuitProp { get; }
-    public Value ValueProp { get; }
+    public Suit Suit { get; }
+
+    public Value Value { get; }
 
     public string ToHtmlString()
     {
-        return SpanFromSuit(SuitProp) + $" {ValueProp}";
+        return SpanFromSuit(Suit) + $" {Value}";
     }
 
     public override string ToString()
     {
-        return $"{SuitProp} {ValueProp}";
+        return $"{Suit} {Value}";
     }
 
     public int CompareTo(object? obj)
@@ -30,13 +33,13 @@ public class Poker : ICard, IComparable
 
         var other = (Poker) obj;
 
-        var valCompare = ValueProp.CompareTo(other.ValueProp);
-        return valCompare == 0 ? SuitProp.CompareTo(other.SuitProp) : valCompare;
+        var valCompare = Value.CompareTo(other.Value);
+        return valCompare == 0 ? Suit.CompareTo(other.Suit) : valCompare;
     }
 
     public static string SpanFromSuit(Suit suit)
     {
-        if (suit is Suit.Hearts or Suit.Tiles)
+        if (suit is Suit.Hearts or Suit.Diamonds)
         {
             return $"<span style=\"font-family:'Suits';color:red;\">&#{0xe900 + suit}</span>";
         }
@@ -57,30 +60,5 @@ public class Poker : ICard, IComparable
         }
 
         return result;
-    }
-
-    public enum Suit
-    {
-        Clovers,
-        Pikes,
-        Hearts,
-        Tiles
-    }
-
-    public enum Value
-    {
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Ten,
-        Jack,
-        Queen,
-        King,
-        Ace
-    }
+    }    
 }
