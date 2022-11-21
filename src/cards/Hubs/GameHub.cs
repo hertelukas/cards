@@ -57,14 +57,21 @@ public class GameHub : Hub
 
     public async Task ReceiveSelectGame(int lobbyId, GameEnum game)
     {
-        _lobbyService.GetLobby(lobbyId).SelectGame(game);
-        await SendSelectedGameAsync(lobbyId, IGameService.GetTitle(game), IGameService.GetDescription(game));
+        Lobby lobby = _lobbyService.GetLobby(lobbyId);
+        lobby.SelectGame(game);
+
+        if (lobby.Game == null)
+        {
+            throw new Exception($"{nameof(lobby.Game)} was null in {nameof(GameHub.ReceiveSelectGame)}");
+        }
+
+        await SendSelectedGameAsync(lobbyId, lobby.Game.Title, lobby.Game.Description);
     }
 
     public async Task ReceiveStartGame(int lobbyId)
     {
         _logger.LogInformation("Lobby {LobbyId} started a game", lobbyId);
-        _lobbyService.GetLobby(lobbyId).StartGame(new DummyInformation());
+        _lobbyService.GetLobby(lobbyId).StartGame();
         await SendGameUpdateAsync(lobbyId);
     }
 
